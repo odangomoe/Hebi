@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<database name="default" namespace="Odango\Hebi\Model">
+    <table name="crawl_item">
+        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
+        <column name="target" type="varchar" size="255" />
+        <column name="external_id" type="varchar" size="255" />
+        <column name="status" type="varchar" size="50" />
+        <column name="type" type="varchar" size="50" />
+        <column name="last_updated" type="timestamp" />
+        <column name="last_success" type="timestamp" />
+
+        <index name="crawl_target_type">
+            <index-column name="target" />
+            <index-column name="type" />
+        </index>
+
+        <index name="crawl_target_id">
+            <index-column name="target" />
+            <index-column name="external_id" />
+        </index>
+
+        <index name="crawl_status">
+            <index-column name="status" />
+        </index>
+
+        <behavior name="timestampable">
+            <parameter name="update_column" value="last_updated"/>
+        </behavior>
+    </table>
+    <table name="torrent">
+        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
+        <column name="info_hash" type="varchar" size="32" required="true" />
+        <column name="cached_torrent_file" type="LONGVARCHAR" />
+        <column name="torrent_title" type="LONGVARCHAR" />
+        <column name="submitter_id" type="BIGINT" />
+        <column name="trackers" type="array" />
+        <column name="date_crawled" type="timestamp"/>
+        <column name="last_updated" type="timestamp"/>
+
+        <column name="crawl_item_id" type="bigint" />
+
+        <foreign-key foreignTable="crawl_item">
+            <reference foreign="id" local="crawl_item_id"/>
+        </foreign-key>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="date_crawled"/>
+            <parameter name="update_column" value="last_updated"/>
+        </behavior>
+    </table>
+    <table name="torrent_status">
+        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
+        <column name="torrent_id" type="BIGINT" required="true" />
+
+        <column name="seeders" type="bigint" />
+        <column name="leechers" type="bigint" />
+        <column name="downloaded" type="bigint" />
+
+        <column name="last_updated" type="timestamp"/>
+
+        <foreign-key foreignTable="torrent">
+            <reference foreign="id" local="torrent_id"/>
+        </foreign-key>
+
+        <behavior name="timestampable">
+            <parameter name="update_column" value="last_updated"/>
+        </behavior>
+    </table>
+    <table name="torrent_metadata">
+        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
+        <column name="torrent_id" type="BIGINT" required="true" />
+
+        <column name="name" type="LONGVARCHAR" size="255" />
+        <column name="type" type="varchar" size="255" />
+        <column name="group" type="varchar" size="255" />
+        <column name="unparsed" type="array" />
+        <column name="resolution" type="varchar" size="255" />
+        <column name="video" type="varchar" size="255" />
+        <column name="video-depth" type="varchar" size="255" />
+        <column name="audio" type="varchar" size="255" />
+        <column name="source" type="varchar" size="255" />
+        <column name="container" type="varchar" size="255" />
+        <column name="crc32" type="varchar" size="255" />
+        <column name="ep" type="varchar" size="255" />
+        <column name="volume" type="varchar" size="255" />
+        <column name="collection" type="array" size="255" />
+
+        <index name="metadata_name">
+            <index-column name="name" size="200" />
+        </index>
+
+        <foreign-key foreignTable="torrent">
+            <reference foreign="id" local="torrent_id"/>
+        </foreign-key>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="date_created"/>
+            <parameter name="update_column" value="last_updated"/>
+        </behavior>
+    </table>
+</database>
