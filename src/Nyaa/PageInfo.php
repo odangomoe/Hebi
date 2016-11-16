@@ -1,16 +1,32 @@
 <?php
 
 
-namespace Odango\Hebo\Nyaa\Crawler;
-
+namespace Odango\Hebi\Nyaa;
 
 class PageInfo
 {
+    private $isFound;
     private $title;
     private $submitterName;
     private $submitterId;
     private $categoryId;
     private $torrentId;
+
+    /**
+     * @return mixed
+     */
+    public function getIsFound()
+    {
+        return $this->isFound;
+    }
+
+    /**
+     * @param mixed $isFound
+     */
+    public function setIsFound($isFound)
+    {
+        $this->isFound = $isFound;
+    }
 
     /**
      * @return mixed

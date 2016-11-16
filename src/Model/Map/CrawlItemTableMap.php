@@ -156,14 +156,14 @@ class CrawlItemTableMap extends TableMap
         // attributes
         $this->setName('crawl_item');
         $this->setPhpName('CrawlItem');
-        $this->setIdentifierQuoting(false);
+        $this->setIdentifierQuoting(true);
         $this->setClassName('\\Odango\\Hebi\\Model\\CrawlItem');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'BIGINT', true, null, null);
         $this->addColumn('target', 'Target', 'VARCHAR', false, 255, null);
-        $this->addColumn('external_id', 'ExternalId', 'VARCHAR', false, 255, null);
+        $this->addColumn('external_id', 'ExternalId', 'BIGINT', false, null, null);
         $this->addColumn('status', 'Status', 'VARCHAR', false, 50, null);
         $this->addColumn('type', 'Type', 'VARCHAR', false, 50, null);
         $this->addColumn('last_updated', 'LastUpdated', 'TIMESTAMP', false, null, null);
@@ -176,13 +176,13 @@ class CrawlItemTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Torrent', '\\Odango\\Hebi\\Model\\Torrent', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Torrent', '\\Odango\\Hebi\\Model\\Torrent', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
-    0 => ':crawl_item_id',
+    0 => ':id',
     1 => ':id',
   ),
-), null, null, 'Torrents', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**

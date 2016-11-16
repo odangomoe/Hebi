@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Odango\Hebo\Test\Nyaa;
+namespace Odango\Hebi\Test\Nyaa;
 
 
-use Odango\Hebo\Nyaa\Crawler\PageReader;
+use Odango\Hebi\Nyaa\PageReader;
 
 class PageReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,5 +20,15 @@ class PageReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(64513, $info->getSubmitterId());
         $this->assertEquals('1_37', $info->getCategoryId());
         $this->assertEquals(825702, $info->getTorrentId());
+        $this->assertTrue($info->getIsFound());
+    }
+
+    public function testInfoExtractionOnNotFound() {
+        $page = file_get_contents(__DIR__ . '/../data/example-nyaa-page-not-found.html');
+        $pageReader = PageReader::createFromSource($page);
+        $this->assertEquals($page, $pageReader->getSource());
+        $info = $pageReader->extractInfo();
+
+        $this->assertFalse($info->getIsFound());
     }
 }

@@ -1,70 +1,25 @@
 <?php
 
 
-namespace Odango\Hebo\Nyaa\Crawler;
+namespace Odango\Hebi\Nyaa;
 
 
 use DOMWrap\Document;
 use DOMWrap\Element;
+use Odango\Hebi\Nyaa\Reader;
+use Symfony\Component\Validator\Tests\Fixtures\Countable;
 
-class PageReader
+class PageReader extends Reader
 {
-    /**
-     * @var string
-     */
-    private $source;
-
-    /**
-     * @var Document
-     */
-    private $document;
-
-    /**
-     * @return Document
-     */
-    public function getDocument(): Document
-    {
-        if ($this->document == null) {
-            $this->setDocument(new Document());
-        }
-
-        return $this->document;
-    }
-
-    /**
-     * @param Document $document
-     */
-    public function setDocument(Document $document)
-    {
-        $this->document = $document;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSource(): string
-    {
-        return $this->source ?? "";
-    }
-
-    /**
-     * @param string $source
-     */
-    public function setSource($source)
-    {
-        $this->getDocument()->setHtml($source);
-        $this->source = $source;
-    }
-
-    static public function createFromSource($source): PageReader {
-        $pageReader = new static();
-        $pageReader->setSource($source);
-        return $pageReader;
-    }
-
     public function extractInfo(): PageInfo {
         $pageInfo = new PageInfo();
 
+        if (!$this->parseIsFound()) {
+            $pageInfo->setIsFound(false);
+            return $pageInfo;
+        }
+
+        $pageInfo->setIsFound(true);
         $pageInfo->setTitle($this->parseTitle());
         $pageInfo->setSubmitterName($this->parseSubmitterName());
         $pageInfo->setSubmitterId($this->parseSubmitterId());
@@ -86,13 +41,6 @@ class PageReader
         return $this->getSubmitterTableField()->find('a')->first()->getText();
     }
 
-    private function getQueryItemFromUrl($url, $queryItem, $default = null) {
-        $query = parse_url($url, PHP_URL_QUERY);
-        parse_str($query, $queryItems);
-
-        return $queryItems[$queryItem] ?? $default;
-    }
-
     public function parseSubmitterId(): int
     {
         /** @var Element $a */
@@ -112,5 +60,9 @@ class PageReader
     public function parseTorrentId() {
         $href = $this->getDocument()->find('.viewdownloadbutton > a')->last()->attr('href');
         return intval($this->getQueryItemFromUrl($href, 'tid', -1));
+    }
+
+    public function parseIsFound() {
+        return strpos($this->getSource(), "The torrent you are looking for does not appear to be in the database.") === false;
     }
 }

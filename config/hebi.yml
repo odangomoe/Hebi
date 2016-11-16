@@ -1,0 +1,9 @@
+hebi:
+  log: storage/hebi.log
+  nyaa:
+    category:
+      - 1_37
+    proxy: 'http://proxy'
+    verify_ssl: false
+    batch: 100
+    site: 'https://nyaa.se'

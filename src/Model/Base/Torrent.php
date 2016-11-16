@@ -13,15 +13,12 @@ use Odango\Hebi\Model\TorrentMetadataQuery as ChildTorrentMetadataQuery;
 use Odango\Hebi\Model\TorrentQuery as ChildTorrentQuery;
 use Odango\Hebi\Model\TorrentStatus as ChildTorrentStatus;
 use Odango\Hebi\Model\TorrentStatusQuery as ChildTorrentStatusQuery;
-use Odango\Hebi\Model\Map\TorrentMetadataTableMap;
-use Odango\Hebi\Model\Map\TorrentStatusTableMap;
 use Odango\Hebi\Model\Map\TorrentTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -135,28 +132,19 @@ abstract class Torrent implements ActiveRecordInterface
     protected $last_updated;
 
     /**
-     * The value for the crawl_item_id field.
-     *
-     * @var        string
-     */
-    protected $crawl_item_id;
-
-    /**
      * @var        ChildCrawlItem
      */
     protected $aCrawlItem;
 
     /**
-     * @var        ObjectCollection|ChildTorrentStatus[] Collection to store aggregation of ChildTorrentStatus objects.
+     * @var        ChildTorrentStatus one-to-one related ChildTorrentStatus object
      */
-    protected $collTorrentStatuses;
-    protected $collTorrentStatusesPartial;
+    protected $singleTorrentStatus;
 
     /**
-     * @var        ObjectCollection|ChildTorrentMetadata[] Collection to store aggregation of ChildTorrentMetadata objects.
+     * @var        ChildTorrentMetadata one-to-one related ChildTorrentMetadata object
      */
-    protected $collTorrentMetadatas;
-    protected $collTorrentMetadatasPartial;
+    protected $singleTorrentMetadata;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -165,18 +153,6 @@ abstract class Torrent implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTorrentStatus[]
-     */
-    protected $torrentStatusesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTorrentMetadata[]
-     */
-    protected $torrentMetadatasScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Odango\Hebi\Model\Base\Torrent object.
@@ -523,16 +499,6 @@ abstract class Torrent implements ActiveRecordInterface
     }
 
     /**
-     * Get the [crawl_item_id] column value.
-     *
-     * @return string
-     */
-    public function getCrawlItemId()
-    {
-        return $this->crawl_item_id;
-    }
-
-    /**
      * Set the value of [id] column.
      *
      * @param string $v new value
@@ -547,6 +513,10 @@ abstract class Torrent implements ActiveRecordInterface
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[TorrentTableMap::COL_ID] = true;
+        }
+
+        if ($this->aCrawlItem !== null && $this->aCrawlItem->getId() !== $v) {
+            $this->aCrawlItem = null;
         }
 
         return $this;
@@ -724,30 +694,6 @@ abstract class Torrent implements ActiveRecordInterface
     } // setLastUpdated()
 
     /**
-     * Set the value of [crawl_item_id] column.
-     *
-     * @param string $v new value
-     * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
-     */
-    public function setCrawlItemId($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->crawl_item_id !== $v) {
-            $this->crawl_item_id = $v;
-            $this->modifiedColumns[TorrentTableMap::COL_CRAWL_ITEM_ID] = true;
-        }
-
-        if ($this->aCrawlItem !== null && $this->aCrawlItem->getId() !== $v) {
-            $this->aCrawlItem = null;
-        }
-
-        return $this;
-    } // setCrawlItemId()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -813,9 +759,6 @@ abstract class Torrent implements ActiveRecordInterface
                 $col = null;
             }
             $this->last_updated = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : TorrentTableMap::translateFieldName('CrawlItemId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->crawl_item_id = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -824,7 +767,7 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\Torrent'), 0, $e);
@@ -846,7 +789,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aCrawlItem !== null && $this->crawl_item_id !== $this->aCrawlItem->getId()) {
+        if ($this->aCrawlItem !== null && $this->id !== $this->aCrawlItem->getId()) {
             $this->aCrawlItem = null;
         }
     } // ensureConsistency
@@ -889,9 +832,9 @@ abstract class Torrent implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCrawlItem = null;
-            $this->collTorrentStatuses = null;
+            $this->singleTorrentStatus = null;
 
-            $this->collTorrentMetadatas = null;
+            $this->singleTorrentMetadata = null;
 
         } // if (deep)
     }
@@ -1027,37 +970,15 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->torrentStatusesScheduledForDeletion !== null) {
-                if (!$this->torrentStatusesScheduledForDeletion->isEmpty()) {
-                    \Odango\Hebi\Model\TorrentStatusQuery::create()
-                        ->filterByPrimaryKeys($this->torrentStatusesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->torrentStatusesScheduledForDeletion = null;
+            if ($this->singleTorrentStatus !== null) {
+                if (!$this->singleTorrentStatus->isDeleted() && ($this->singleTorrentStatus->isNew() || $this->singleTorrentStatus->isModified())) {
+                    $affectedRows += $this->singleTorrentStatus->save($con);
                 }
             }
 
-            if ($this->collTorrentStatuses !== null) {
-                foreach ($this->collTorrentStatuses as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->torrentMetadatasScheduledForDeletion !== null) {
-                if (!$this->torrentMetadatasScheduledForDeletion->isEmpty()) {
-                    \Odango\Hebi\Model\TorrentMetadataQuery::create()
-                        ->filterByPrimaryKeys($this->torrentMetadatasScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->torrentMetadatasScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTorrentMetadatas !== null) {
-                foreach ($this->collTorrentMetadatas as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
+            if ($this->singleTorrentMetadata !== null) {
+                if (!$this->singleTorrentMetadata->isDeleted() && ($this->singleTorrentMetadata->isNew() || $this->singleTorrentMetadata->isModified())) {
+                    $affectedRows += $this->singleTorrentMetadata->save($con);
                 }
             }
 
@@ -1081,42 +1002,35 @@ abstract class Torrent implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TorrentTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TorrentTableMap::COL_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TorrentTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_INFO_HASH)) {
-            $modifiedColumns[':p' . $index++]  = 'info_hash';
+            $modifiedColumns[':p' . $index++]  = '`info_hash`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_CACHED_TORRENT_FILE)) {
-            $modifiedColumns[':p' . $index++]  = 'cached_torrent_file';
+            $modifiedColumns[':p' . $index++]  = '`cached_torrent_file`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_TORRENT_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'torrent_title';
+            $modifiedColumns[':p' . $index++]  = '`torrent_title`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_SUBMITTER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'submitter_id';
+            $modifiedColumns[':p' . $index++]  = '`submitter_id`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_TRACKERS)) {
-            $modifiedColumns[':p' . $index++]  = 'trackers';
+            $modifiedColumns[':p' . $index++]  = '`trackers`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
-            $modifiedColumns[':p' . $index++]  = 'date_crawled';
+            $modifiedColumns[':p' . $index++]  = '`date_crawled`';
         }
         if ($this->isColumnModified(TorrentTableMap::COL_LAST_UPDATED)) {
-            $modifiedColumns[':p' . $index++]  = 'last_updated';
-        }
-        if ($this->isColumnModified(TorrentTableMap::COL_CRAWL_ITEM_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'crawl_item_id';
+            $modifiedColumns[':p' . $index++]  = '`last_updated`';
         }
 
         $sql = sprintf(
-            'INSERT INTO torrent (%s) VALUES (%s)',
+            'INSERT INTO `torrent` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1125,32 +1039,29 @@ abstract class Torrent implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'info_hash':
+                    case '`info_hash`':
                         $stmt->bindValue($identifier, $this->info_hash, PDO::PARAM_STR);
                         break;
-                    case 'cached_torrent_file':
+                    case '`cached_torrent_file`':
                         $stmt->bindValue($identifier, $this->cached_torrent_file, PDO::PARAM_STR);
                         break;
-                    case 'torrent_title':
+                    case '`torrent_title`':
                         $stmt->bindValue($identifier, $this->torrent_title, PDO::PARAM_STR);
                         break;
-                    case 'submitter_id':
+                    case '`submitter_id`':
                         $stmt->bindValue($identifier, $this->submitter_id, PDO::PARAM_INT);
                         break;
-                    case 'trackers':
+                    case '`trackers`':
                         $stmt->bindValue($identifier, $this->trackers, PDO::PARAM_STR);
                         break;
-                    case 'date_crawled':
+                    case '`date_crawled`':
                         $stmt->bindValue($identifier, $this->date_crawled ? $this->date_crawled->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
-                    case 'last_updated':
+                    case '`last_updated`':
                         $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
-                        break;
-                    case 'crawl_item_id':
-                        $stmt->bindValue($identifier, $this->crawl_item_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -1159,13 +1070,6 @@ abstract class Torrent implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1238,9 +1142,6 @@ abstract class Torrent implements ActiveRecordInterface
             case 7:
                 return $this->getLastUpdated();
                 break;
-            case 8:
-                return $this->getCrawlItemId();
-                break;
             default:
                 return null;
                 break;
@@ -1279,7 +1180,6 @@ abstract class Torrent implements ActiveRecordInterface
             $keys[5] => $this->getTrackers(),
             $keys[6] => $this->getDateCrawled(),
             $keys[7] => $this->getLastUpdated(),
-            $keys[8] => $this->getCrawlItemId(),
         );
         if ($result[$keys[6]] instanceof \DateTime) {
             $result[$keys[6]] = $result[$keys[6]]->format('c');
@@ -1310,35 +1210,35 @@ abstract class Torrent implements ActiveRecordInterface
 
                 $result[$key] = $this->aCrawlItem->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collTorrentStatuses) {
+            if (null !== $this->singleTorrentStatus) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'torrentStatuses';
+                        $key = 'torrentStatus';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'torrent_statuses';
+                        $key = 'torrent_status';
                         break;
                     default:
-                        $key = 'TorrentStatuses';
+                        $key = 'TorrentStatus';
                 }
 
-                $result[$key] = $this->collTorrentStatuses->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->singleTorrentStatus->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collTorrentMetadatas) {
+            if (null !== $this->singleTorrentMetadata) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'torrentMetadatas';
+                        $key = 'torrentMetadata';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'torrent_metadatas';
+                        $key = 'torrent_metadata';
                         break;
                     default:
-                        $key = 'TorrentMetadatas';
+                        $key = 'TorrentMetadata';
                 }
 
-                $result[$key] = $this->collTorrentMetadatas->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->singleTorrentMetadata->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -1402,9 +1302,6 @@ abstract class Torrent implements ActiveRecordInterface
             case 7:
                 $this->setLastUpdated($value);
                 break;
-            case 8:
-                $this->setCrawlItemId($value);
-                break;
         } // switch()
 
         return $this;
@@ -1454,9 +1351,6 @@ abstract class Torrent implements ActiveRecordInterface
         }
         if (array_key_exists($keys[7], $arr)) {
             $this->setLastUpdated($arr[$keys[7]]);
-        }
-        if (array_key_exists($keys[8], $arr)) {
-            $this->setCrawlItemId($arr[$keys[8]]);
         }
     }
 
@@ -1523,9 +1417,6 @@ abstract class Torrent implements ActiveRecordInterface
         if ($this->isColumnModified(TorrentTableMap::COL_LAST_UPDATED)) {
             $criteria->add(TorrentTableMap::COL_LAST_UPDATED, $this->last_updated);
         }
-        if ($this->isColumnModified(TorrentTableMap::COL_CRAWL_ITEM_ID)) {
-            $criteria->add(TorrentTableMap::COL_CRAWL_ITEM_ID, $this->crawl_item_id);
-        }
 
         return $criteria;
     }
@@ -1558,8 +1449,15 @@ abstract class Torrent implements ActiveRecordInterface
     {
         $validPk = null !== $this->getId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation torrent_fk_f1dcb5 to table crawl_item
+        if ($this->aCrawlItem && $hash = spl_object_hash($this->aCrawlItem)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1612,6 +1510,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setId($this->getId());
         $copyObj->setInfoHash($this->getInfoHash());
         $copyObj->setCachedTorrentFile($this->getCachedTorrentFile());
         $copyObj->setTorrentTitle($this->getTorrentTitle());
@@ -1619,30 +1518,26 @@ abstract class Torrent implements ActiveRecordInterface
         $copyObj->setTrackers($this->getTrackers());
         $copyObj->setDateCrawled($this->getDateCrawled());
         $copyObj->setLastUpdated($this->getLastUpdated());
-        $copyObj->setCrawlItemId($this->getCrawlItemId());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getTorrentStatuses() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTorrentStatus($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getTorrentStatus();
+            if ($relObj) {
+                $copyObj->setTorrentStatus($relObj->copy($deepCopy));
             }
 
-            foreach ($this->getTorrentMetadatas() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTorrentMetadata($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getTorrentMetadata();
+            if ($relObj) {
+                $copyObj->setTorrentMetadata($relObj->copy($deepCopy));
             }
 
         } // if ($deepCopy)
 
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1678,17 +1573,16 @@ abstract class Torrent implements ActiveRecordInterface
     public function setCrawlItem(ChildCrawlItem $v = null)
     {
         if ($v === null) {
-            $this->setCrawlItemId(NULL);
+            $this->setId(NULL);
         } else {
-            $this->setCrawlItemId($v->getId());
+            $this->setId($v->getId());
         }
 
         $this->aCrawlItem = $v;
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCrawlItem object, it will not be re-added.
+        // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->addTorrent($this);
+            $v->setTorrent($this);
         }
 
 
@@ -1705,15 +1599,10 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function getCrawlItem(ConnectionInterface $con = null)
     {
-        if ($this->aCrawlItem === null && (($this->crawl_item_id !== "" && $this->crawl_item_id !== null))) {
-            $this->aCrawlItem = ChildCrawlItemQuery::create()->findPk($this->crawl_item_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCrawlItem->addTorrents($this);
-             */
+        if ($this->aCrawlItem === null && (($this->id !== "" && $this->id !== null))) {
+            $this->aCrawlItem = ChildCrawlItemQuery::create()->findPk($this->id, $con);
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aCrawlItem->setTorrent($this);
         }
 
         return $this->aCrawlItem;
@@ -1730,459 +1619,75 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('TorrentStatus' == $relationName) {
-            return $this->initTorrentStatuses();
-        }
-        if ('TorrentMetadata' == $relationName) {
-            return $this->initTorrentMetadatas();
-        }
     }
 
     /**
-     * Clears out the collTorrentStatuses collection
+     * Gets a single ChildTorrentStatus object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTorrentStatuses()
-     */
-    public function clearTorrentStatuses()
-    {
-        $this->collTorrentStatuses = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTorrentStatuses collection loaded partially.
-     */
-    public function resetPartialTorrentStatuses($v = true)
-    {
-        $this->collTorrentStatusesPartial = $v;
-    }
-
-    /**
-     * Initializes the collTorrentStatuses collection.
-     *
-     * By default this just sets the collTorrentStatuses collection to an empty array (like clearcollTorrentStatuses());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTorrentStatuses($overrideExisting = true)
-    {
-        if (null !== $this->collTorrentStatuses && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = TorrentStatusTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collTorrentStatuses = new $collectionClassName;
-        $this->collTorrentStatuses->setModel('\Odango\Hebi\Model\TorrentStatus');
-    }
-
-    /**
-     * Gets an array of ChildTorrentStatus objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildTorrent is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTorrentStatus[] List of ChildTorrentStatus objects
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildTorrentStatus
      * @throws PropelException
      */
-    public function getTorrentStatuses(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getTorrentStatus(ConnectionInterface $con = null)
     {
-        $partial = $this->collTorrentStatusesPartial && !$this->isNew();
-        if (null === $this->collTorrentStatuses || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTorrentStatuses) {
-                // return empty collection
-                $this->initTorrentStatuses();
-            } else {
-                $collTorrentStatuses = ChildTorrentStatusQuery::create(null, $criteria)
-                    ->filterByTorrent($this)
-                    ->find($con);
 
-                if (null !== $criteria) {
-                    if (false !== $this->collTorrentStatusesPartial && count($collTorrentStatuses)) {
-                        $this->initTorrentStatuses(false);
-
-                        foreach ($collTorrentStatuses as $obj) {
-                            if (false == $this->collTorrentStatuses->contains($obj)) {
-                                $this->collTorrentStatuses->append($obj);
-                            }
-                        }
-
-                        $this->collTorrentStatusesPartial = true;
-                    }
-
-                    return $collTorrentStatuses;
-                }
-
-                if ($partial && $this->collTorrentStatuses) {
-                    foreach ($this->collTorrentStatuses as $obj) {
-                        if ($obj->isNew()) {
-                            $collTorrentStatuses[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTorrentStatuses = $collTorrentStatuses;
-                $this->collTorrentStatusesPartial = false;
-            }
+        if ($this->singleTorrentStatus === null && !$this->isNew()) {
+            $this->singleTorrentStatus = ChildTorrentStatusQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collTorrentStatuses;
+        return $this->singleTorrentStatus;
     }
 
     /**
-     * Sets a collection of ChildTorrentStatus objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single ChildTorrentStatus object as related to this object by a one-to-one relationship.
      *
-     * @param      Collection $torrentStatuses A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildTorrent The current object (for fluent API support)
-     */
-    public function setTorrentStatuses(Collection $torrentStatuses, ConnectionInterface $con = null)
-    {
-        /** @var ChildTorrentStatus[] $torrentStatusesToDelete */
-        $torrentStatusesToDelete = $this->getTorrentStatuses(new Criteria(), $con)->diff($torrentStatuses);
-
-
-        $this->torrentStatusesScheduledForDeletion = $torrentStatusesToDelete;
-
-        foreach ($torrentStatusesToDelete as $torrentStatusRemoved) {
-            $torrentStatusRemoved->setTorrent(null);
-        }
-
-        $this->collTorrentStatuses = null;
-        foreach ($torrentStatuses as $torrentStatus) {
-            $this->addTorrentStatus($torrentStatus);
-        }
-
-        $this->collTorrentStatuses = $torrentStatuses;
-        $this->collTorrentStatusesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related TorrentStatus objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related TorrentStatus objects.
-     * @throws PropelException
-     */
-    public function countTorrentStatuses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTorrentStatusesPartial && !$this->isNew();
-        if (null === $this->collTorrentStatuses || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTorrentStatuses) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getTorrentStatuses());
-            }
-
-            $query = ChildTorrentStatusQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTorrent($this)
-                ->count($con);
-        }
-
-        return count($this->collTorrentStatuses);
-    }
-
-    /**
-     * Method called to associate a ChildTorrentStatus object to this object
-     * through the ChildTorrentStatus foreign key attribute.
-     *
-     * @param  ChildTorrentStatus $l ChildTorrentStatus
+     * @param  ChildTorrentStatus $v ChildTorrentStatus
      * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
-     */
-    public function addTorrentStatus(ChildTorrentStatus $l)
-    {
-        if ($this->collTorrentStatuses === null) {
-            $this->initTorrentStatuses();
-            $this->collTorrentStatusesPartial = true;
-        }
-
-        if (!$this->collTorrentStatuses->contains($l)) {
-            $this->doAddTorrentStatus($l);
-
-            if ($this->torrentStatusesScheduledForDeletion and $this->torrentStatusesScheduledForDeletion->contains($l)) {
-                $this->torrentStatusesScheduledForDeletion->remove($this->torrentStatusesScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTorrentStatus $torrentStatus The ChildTorrentStatus object to add.
-     */
-    protected function doAddTorrentStatus(ChildTorrentStatus $torrentStatus)
-    {
-        $this->collTorrentStatuses[]= $torrentStatus;
-        $torrentStatus->setTorrent($this);
-    }
-
-    /**
-     * @param  ChildTorrentStatus $torrentStatus The ChildTorrentStatus object to remove.
-     * @return $this|ChildTorrent The current object (for fluent API support)
-     */
-    public function removeTorrentStatus(ChildTorrentStatus $torrentStatus)
-    {
-        if ($this->getTorrentStatuses()->contains($torrentStatus)) {
-            $pos = $this->collTorrentStatuses->search($torrentStatus);
-            $this->collTorrentStatuses->remove($pos);
-            if (null === $this->torrentStatusesScheduledForDeletion) {
-                $this->torrentStatusesScheduledForDeletion = clone $this->collTorrentStatuses;
-                $this->torrentStatusesScheduledForDeletion->clear();
-            }
-            $this->torrentStatusesScheduledForDeletion[]= clone $torrentStatus;
-            $torrentStatus->setTorrent(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collTorrentMetadatas collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTorrentMetadatas()
-     */
-    public function clearTorrentMetadatas()
-    {
-        $this->collTorrentMetadatas = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTorrentMetadatas collection loaded partially.
-     */
-    public function resetPartialTorrentMetadatas($v = true)
-    {
-        $this->collTorrentMetadatasPartial = $v;
-    }
-
-    /**
-     * Initializes the collTorrentMetadatas collection.
-     *
-     * By default this just sets the collTorrentMetadatas collection to an empty array (like clearcollTorrentMetadatas());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTorrentMetadatas($overrideExisting = true)
-    {
-        if (null !== $this->collTorrentMetadatas && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = TorrentMetadataTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collTorrentMetadatas = new $collectionClassName;
-        $this->collTorrentMetadatas->setModel('\Odango\Hebi\Model\TorrentMetadata');
-    }
-
-    /**
-     * Gets an array of ChildTorrentMetadata objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildTorrent is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTorrentMetadata[] List of ChildTorrentMetadata objects
      * @throws PropelException
      */
-    public function getTorrentMetadatas(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function setTorrentStatus(ChildTorrentStatus $v = null)
     {
-        $partial = $this->collTorrentMetadatasPartial && !$this->isNew();
-        if (null === $this->collTorrentMetadatas || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTorrentMetadatas) {
-                // return empty collection
-                $this->initTorrentMetadatas();
-            } else {
-                $collTorrentMetadatas = ChildTorrentMetadataQuery::create(null, $criteria)
-                    ->filterByTorrent($this)
-                    ->find($con);
+        $this->singleTorrentStatus = $v;
 
-                if (null !== $criteria) {
-                    if (false !== $this->collTorrentMetadatasPartial && count($collTorrentMetadatas)) {
-                        $this->initTorrentMetadatas(false);
-
-                        foreach ($collTorrentMetadatas as $obj) {
-                            if (false == $this->collTorrentMetadatas->contains($obj)) {
-                                $this->collTorrentMetadatas->append($obj);
-                            }
-                        }
-
-                        $this->collTorrentMetadatasPartial = true;
-                    }
-
-                    return $collTorrentMetadatas;
-                }
-
-                if ($partial && $this->collTorrentMetadatas) {
-                    foreach ($this->collTorrentMetadatas as $obj) {
-                        if ($obj->isNew()) {
-                            $collTorrentMetadatas[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTorrentMetadatas = $collTorrentMetadatas;
-                $this->collTorrentMetadatasPartial = false;
-            }
+        // Make sure that that the passed-in ChildTorrentStatus isn't already associated with this object
+        if ($v !== null && $v->getTorrent(null, false) === null) {
+            $v->setTorrent($this);
         }
-
-        return $this->collTorrentMetadatas;
-    }
-
-    /**
-     * Sets a collection of ChildTorrentMetadata objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $torrentMetadatas A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildTorrent The current object (for fluent API support)
-     */
-    public function setTorrentMetadatas(Collection $torrentMetadatas, ConnectionInterface $con = null)
-    {
-        /** @var ChildTorrentMetadata[] $torrentMetadatasToDelete */
-        $torrentMetadatasToDelete = $this->getTorrentMetadatas(new Criteria(), $con)->diff($torrentMetadatas);
-
-
-        $this->torrentMetadatasScheduledForDeletion = $torrentMetadatasToDelete;
-
-        foreach ($torrentMetadatasToDelete as $torrentMetadataRemoved) {
-            $torrentMetadataRemoved->setTorrent(null);
-        }
-
-        $this->collTorrentMetadatas = null;
-        foreach ($torrentMetadatas as $torrentMetadata) {
-            $this->addTorrentMetadata($torrentMetadata);
-        }
-
-        $this->collTorrentMetadatas = $torrentMetadatas;
-        $this->collTorrentMetadatasPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related TorrentMetadata objects.
+     * Gets a single ChildTorrentMetadata object, which is related to this object by a one-to-one relationship.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related TorrentMetadata objects.
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildTorrentMetadata
      * @throws PropelException
      */
-    public function countTorrentMetadatas(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function getTorrentMetadata(ConnectionInterface $con = null)
     {
-        $partial = $this->collTorrentMetadatasPartial && !$this->isNew();
-        if (null === $this->collTorrentMetadatas || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTorrentMetadatas) {
-                return 0;
-            }
 
-            if ($partial && !$criteria) {
-                return count($this->getTorrentMetadatas());
-            }
-
-            $query = ChildTorrentMetadataQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTorrent($this)
-                ->count($con);
+        if ($this->singleTorrentMetadata === null && !$this->isNew()) {
+            $this->singleTorrentMetadata = ChildTorrentMetadataQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return count($this->collTorrentMetadatas);
+        return $this->singleTorrentMetadata;
     }
 
     /**
-     * Method called to associate a ChildTorrentMetadata object to this object
-     * through the ChildTorrentMetadata foreign key attribute.
+     * Sets a single ChildTorrentMetadata object as related to this object by a one-to-one relationship.
      *
-     * @param  ChildTorrentMetadata $l ChildTorrentMetadata
+     * @param  ChildTorrentMetadata $v ChildTorrentMetadata
      * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
+     * @throws PropelException
      */
-    public function addTorrentMetadata(ChildTorrentMetadata $l)
+    public function setTorrentMetadata(ChildTorrentMetadata $v = null)
     {
-        if ($this->collTorrentMetadatas === null) {
-            $this->initTorrentMetadatas();
-            $this->collTorrentMetadatasPartial = true;
-        }
+        $this->singleTorrentMetadata = $v;
 
-        if (!$this->collTorrentMetadatas->contains($l)) {
-            $this->doAddTorrentMetadata($l);
-
-            if ($this->torrentMetadatasScheduledForDeletion and $this->torrentMetadatasScheduledForDeletion->contains($l)) {
-                $this->torrentMetadatasScheduledForDeletion->remove($this->torrentMetadatasScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTorrentMetadata $torrentMetadata The ChildTorrentMetadata object to add.
-     */
-    protected function doAddTorrentMetadata(ChildTorrentMetadata $torrentMetadata)
-    {
-        $this->collTorrentMetadatas[]= $torrentMetadata;
-        $torrentMetadata->setTorrent($this);
-    }
-
-    /**
-     * @param  ChildTorrentMetadata $torrentMetadata The ChildTorrentMetadata object to remove.
-     * @return $this|ChildTorrent The current object (for fluent API support)
-     */
-    public function removeTorrentMetadata(ChildTorrentMetadata $torrentMetadata)
-    {
-        if ($this->getTorrentMetadatas()->contains($torrentMetadata)) {
-            $pos = $this->collTorrentMetadatas->search($torrentMetadata);
-            $this->collTorrentMetadatas->remove($pos);
-            if (null === $this->torrentMetadatasScheduledForDeletion) {
-                $this->torrentMetadatasScheduledForDeletion = clone $this->collTorrentMetadatas;
-                $this->torrentMetadatasScheduledForDeletion->clear();
-            }
-            $this->torrentMetadatasScheduledForDeletion[]= clone $torrentMetadata;
-            $torrentMetadata->setTorrent(null);
+        // Make sure that that the passed-in ChildTorrentMetadata isn't already associated with this object
+        if ($v !== null && $v->getTorrent(null, false) === null) {
+            $v->setTorrent($this);
         }
 
         return $this;
@@ -2207,7 +1712,6 @@ abstract class Torrent implements ActiveRecordInterface
         $this->trackers_unserialized = null;
         $this->date_crawled = null;
         $this->last_updated = null;
-        $this->crawl_item_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -2226,20 +1730,16 @@ abstract class Torrent implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collTorrentStatuses) {
-                foreach ($this->collTorrentStatuses as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleTorrentStatus) {
+                $this->singleTorrentStatus->clearAllReferences($deep);
             }
-            if ($this->collTorrentMetadatas) {
-                foreach ($this->collTorrentMetadatas as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleTorrentMetadata) {
+                $this->singleTorrentMetadata->clearAllReferences($deep);
             }
         } // if ($deep)
 
-        $this->collTorrentStatuses = null;
-        $this->collTorrentMetadatas = null;
+        $this->singleTorrentStatus = null;
+        $this->singleTorrentMetadata = null;
         $this->aCrawlItem = null;
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nyaa;
+namespace Odango\Hebi\Nyaa;
 
 
 use Rych\Bencode\Bencode;

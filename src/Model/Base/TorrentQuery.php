@@ -28,7 +28,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery orderByTrackers($order = Criteria::ASC) Order by the trackers column
  * @method     ChildTorrentQuery orderByDateCrawled($order = Criteria::ASC) Order by the date_crawled column
  * @method     ChildTorrentQuery orderByLastUpdated($order = Criteria::ASC) Order by the last_updated column
- * @method     ChildTorrentQuery orderByCrawlItemId($order = Criteria::ASC) Order by the crawl_item_id column
  *
  * @method     ChildTorrentQuery groupById() Group by the id column
  * @method     ChildTorrentQuery groupByInfoHash() Group by the info_hash column
@@ -38,7 +37,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery groupByTrackers() Group by the trackers column
  * @method     ChildTorrentQuery groupByDateCrawled() Group by the date_crawled column
  * @method     ChildTorrentQuery groupByLastUpdated() Group by the last_updated column
- * @method     ChildTorrentQuery groupByCrawlItemId() Group by the crawl_item_id column
  *
  * @method     ChildTorrentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildTorrentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -90,8 +88,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent findOneBySubmitterId(string $submitter_id) Return the first ChildTorrent filtered by the submitter_id column
  * @method     ChildTorrent findOneByTrackers(array $trackers) Return the first ChildTorrent filtered by the trackers column
  * @method     ChildTorrent findOneByDateCrawled(string $date_crawled) Return the first ChildTorrent filtered by the date_crawled column
- * @method     ChildTorrent findOneByLastUpdated(string $last_updated) Return the first ChildTorrent filtered by the last_updated column
- * @method     ChildTorrent findOneByCrawlItemId(string $crawl_item_id) Return the first ChildTorrent filtered by the crawl_item_id column *
+ * @method     ChildTorrent findOneByLastUpdated(string $last_updated) Return the first ChildTorrent filtered by the last_updated column *
 
  * @method     ChildTorrent requirePk($key, ConnectionInterface $con = null) Return the ChildTorrent by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOne(ConnectionInterface $con = null) Return the first ChildTorrent matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -104,7 +101,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent requireOneByTrackers(array $trackers) Return the first ChildTorrent filtered by the trackers column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneByDateCrawled(string $date_crawled) Return the first ChildTorrent filtered by the date_crawled column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneByLastUpdated(string $last_updated) Return the first ChildTorrent filtered by the last_updated column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTorrent requireOneByCrawlItemId(string $crawl_item_id) Return the first ChildTorrent filtered by the crawl_item_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTorrent[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTorrent objects based on current ModelCriteria
  * @method     ChildTorrent[]|ObjectCollection findById(string $id) Return ChildTorrent objects filtered by the id column
@@ -115,7 +111,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent[]|ObjectCollection findByTrackers(array $trackers) Return ChildTorrent objects filtered by the trackers column
  * @method     ChildTorrent[]|ObjectCollection findByDateCrawled(string $date_crawled) Return ChildTorrent objects filtered by the date_crawled column
  * @method     ChildTorrent[]|ObjectCollection findByLastUpdated(string $last_updated) Return ChildTorrent objects filtered by the last_updated column
- * @method     ChildTorrent[]|ObjectCollection findByCrawlItemId(string $crawl_item_id) Return ChildTorrent objects filtered by the crawl_item_id column
  * @method     ChildTorrent[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -214,7 +209,7 @@ abstract class TorrentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, info_hash, cached_torrent_file, torrent_title, submitter_id, trackers, date_crawled, last_updated, crawl_item_id FROM torrent WHERE id = :p0';
+        $sql = 'SELECT `id`, `info_hash`, `cached_torrent_file`, `torrent_title`, `submitter_id`, `trackers`, `date_crawled`, `last_updated` FROM `torrent` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -313,6 +308,8 @@ abstract class TorrentQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
+     *
+     * @see       filterByCrawlItem()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -629,49 +626,6 @@ abstract class TorrentQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the crawl_item_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCrawlItemId(1234); // WHERE crawl_item_id = 1234
-     * $query->filterByCrawlItemId(array(12, 34)); // WHERE crawl_item_id IN (12, 34)
-     * $query->filterByCrawlItemId(array('min' => 12)); // WHERE crawl_item_id > 12
-     * </code>
-     *
-     * @see       filterByCrawlItem()
-     *
-     * @param     mixed $crawlItemId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTorrentQuery The current query, for fluid interface
-     */
-    public function filterByCrawlItemId($crawlItemId = null, $comparison = null)
-    {
-        if (is_array($crawlItemId)) {
-            $useMinMax = false;
-            if (isset($crawlItemId['min'])) {
-                $this->addUsingAlias(TorrentTableMap::COL_CRAWL_ITEM_ID, $crawlItemId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($crawlItemId['max'])) {
-                $this->addUsingAlias(TorrentTableMap::COL_CRAWL_ITEM_ID, $crawlItemId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TorrentTableMap::COL_CRAWL_ITEM_ID, $crawlItemId, $comparison);
-    }
-
-    /**
      * Filter the query by a related \Odango\Hebi\Model\CrawlItem object
      *
      * @param \Odango\Hebi\Model\CrawlItem|ObjectCollection $crawlItem The related object(s) to use as filter
@@ -685,14 +639,14 @@ abstract class TorrentQuery extends ModelCriteria
     {
         if ($crawlItem instanceof \Odango\Hebi\Model\CrawlItem) {
             return $this
-                ->addUsingAlias(TorrentTableMap::COL_CRAWL_ITEM_ID, $crawlItem->getId(), $comparison);
+                ->addUsingAlias(TorrentTableMap::COL_ID, $crawlItem->getId(), $comparison);
         } elseif ($crawlItem instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(TorrentTableMap::COL_CRAWL_ITEM_ID, $crawlItem->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(TorrentTableMap::COL_ID, $crawlItem->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCrawlItem() only accepts arguments of type \Odango\Hebi\Model\CrawlItem or Collection');
         }
@@ -706,7 +660,7 @@ abstract class TorrentQuery extends ModelCriteria
      *
      * @return $this|ChildTorrentQuery The current query, for fluid interface
      */
-    public function joinCrawlItem($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCrawlItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('CrawlItem');
@@ -741,7 +695,7 @@ abstract class TorrentQuery extends ModelCriteria
      *
      * @return \Odango\Hebi\Model\CrawlItemQuery A secondary query class using the current class as primary query
      */
-    public function useCrawlItemQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCrawlItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinCrawlItem($relationAlias, $joinType)

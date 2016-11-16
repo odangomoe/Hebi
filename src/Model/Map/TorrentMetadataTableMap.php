@@ -59,7 +59,7 @@ class TorrentMetadataTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 18;
+    const NUM_COLUMNS = 17;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,7 @@ class TorrentMetadataTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 18;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'torrent_metadata.id';
+    const NUM_HYDRATE_COLUMNS = 17;
 
     /**
      * the column name for the torrent_id field
@@ -112,9 +107,9 @@ class TorrentMetadataTableMap extends TableMap
     const COL_VIDEO = 'torrent_metadata.video';
 
     /**
-     * the column name for the video-depth field
+     * the column name for the video_depth field
      */
-    const COL_VIDEO-DEPTH = 'torrent_metadata.video-depth';
+    const COL_VIDEO_DEPTH = 'torrent_metadata.video_depth';
 
     /**
      * the column name for the audio field
@@ -173,11 +168,11 @@ class TorrentMetadataTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TorrentId', 'Name', 'Type', 'Group', 'Unparsed', 'Resolution', 'Video', 'Video-depth', 'Audio', 'Source', 'Container', 'Crc32', 'Ep', 'Volume', 'Collection', 'DateCreated', 'LastUpdated', ),
-        self::TYPE_CAMELNAME     => array('id', 'torrentId', 'name', 'type', 'group', 'unparsed', 'resolution', 'video', 'video-depth', 'audio', 'source', 'container', 'crc32', 'ep', 'volume', 'collection', 'dateCreated', 'lastUpdated', ),
-        self::TYPE_COLNAME       => array(TorrentMetadataTableMap::COL_ID, TorrentMetadataTableMap::COL_TORRENT_ID, TorrentMetadataTableMap::COL_NAME, TorrentMetadataTableMap::COL_TYPE, TorrentMetadataTableMap::COL_GROUP, TorrentMetadataTableMap::COL_UNPARSED, TorrentMetadataTableMap::COL_RESOLUTION, TorrentMetadataTableMap::COL_VIDEO, TorrentMetadataTableMap::COL_VIDEO-DEPTH, TorrentMetadataTableMap::COL_AUDIO, TorrentMetadataTableMap::COL_SOURCE, TorrentMetadataTableMap::COL_CONTAINER, TorrentMetadataTableMap::COL_CRC32, TorrentMetadataTableMap::COL_EP, TorrentMetadataTableMap::COL_VOLUME, TorrentMetadataTableMap::COL_COLLECTION, TorrentMetadataTableMap::COL_DATE_CREATED, TorrentMetadataTableMap::COL_LAST_UPDATED, ),
-        self::TYPE_FIELDNAME     => array('id', 'torrent_id', 'name', 'type', 'group', 'unparsed', 'resolution', 'video', 'video-depth', 'audio', 'source', 'container', 'crc32', 'ep', 'volume', 'collection', 'date_created', 'last_updated', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+        self::TYPE_PHPNAME       => array('TorrentId', 'Name', 'Type', 'Group', 'Unparsed', 'Resolution', 'Video', 'VideoDepth', 'Audio', 'Source', 'Container', 'Crc32', 'Ep', 'Volume', 'Collection', 'DateCreated', 'LastUpdated', ),
+        self::TYPE_CAMELNAME     => array('torrentId', 'name', 'type', 'group', 'unparsed', 'resolution', 'video', 'videoDepth', 'audio', 'source', 'container', 'crc32', 'ep', 'volume', 'collection', 'dateCreated', 'lastUpdated', ),
+        self::TYPE_COLNAME       => array(TorrentMetadataTableMap::COL_TORRENT_ID, TorrentMetadataTableMap::COL_NAME, TorrentMetadataTableMap::COL_TYPE, TorrentMetadataTableMap::COL_GROUP, TorrentMetadataTableMap::COL_UNPARSED, TorrentMetadataTableMap::COL_RESOLUTION, TorrentMetadataTableMap::COL_VIDEO, TorrentMetadataTableMap::COL_VIDEO_DEPTH, TorrentMetadataTableMap::COL_AUDIO, TorrentMetadataTableMap::COL_SOURCE, TorrentMetadataTableMap::COL_CONTAINER, TorrentMetadataTableMap::COL_CRC32, TorrentMetadataTableMap::COL_EP, TorrentMetadataTableMap::COL_VOLUME, TorrentMetadataTableMap::COL_COLLECTION, TorrentMetadataTableMap::COL_DATE_CREATED, TorrentMetadataTableMap::COL_LAST_UPDATED, ),
+        self::TYPE_FIELDNAME     => array('torrent_id', 'name', 'type', 'group', 'unparsed', 'resolution', 'video', 'video_depth', 'audio', 'source', 'container', 'crc32', 'ep', 'volume', 'collection', 'date_created', 'last_updated', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
     /**
@@ -187,11 +182,11 @@ class TorrentMetadataTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TorrentId' => 1, 'Name' => 2, 'Type' => 3, 'Group' => 4, 'Unparsed' => 5, 'Resolution' => 6, 'Video' => 7, 'Video-depth' => 8, 'Audio' => 9, 'Source' => 10, 'Container' => 11, 'Crc32' => 12, 'Ep' => 13, 'Volume' => 14, 'Collection' => 15, 'DateCreated' => 16, 'LastUpdated' => 17, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'torrentId' => 1, 'name' => 2, 'type' => 3, 'group' => 4, 'unparsed' => 5, 'resolution' => 6, 'video' => 7, 'video-depth' => 8, 'audio' => 9, 'source' => 10, 'container' => 11, 'crc32' => 12, 'ep' => 13, 'volume' => 14, 'collection' => 15, 'dateCreated' => 16, 'lastUpdated' => 17, ),
-        self::TYPE_COLNAME       => array(TorrentMetadataTableMap::COL_ID => 0, TorrentMetadataTableMap::COL_TORRENT_ID => 1, TorrentMetadataTableMap::COL_NAME => 2, TorrentMetadataTableMap::COL_TYPE => 3, TorrentMetadataTableMap::COL_GROUP => 4, TorrentMetadataTableMap::COL_UNPARSED => 5, TorrentMetadataTableMap::COL_RESOLUTION => 6, TorrentMetadataTableMap::COL_VIDEO => 7, TorrentMetadataTableMap::COL_VIDEO-DEPTH => 8, TorrentMetadataTableMap::COL_AUDIO => 9, TorrentMetadataTableMap::COL_SOURCE => 10, TorrentMetadataTableMap::COL_CONTAINER => 11, TorrentMetadataTableMap::COL_CRC32 => 12, TorrentMetadataTableMap::COL_EP => 13, TorrentMetadataTableMap::COL_VOLUME => 14, TorrentMetadataTableMap::COL_COLLECTION => 15, TorrentMetadataTableMap::COL_DATE_CREATED => 16, TorrentMetadataTableMap::COL_LAST_UPDATED => 17, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'torrent_id' => 1, 'name' => 2, 'type' => 3, 'group' => 4, 'unparsed' => 5, 'resolution' => 6, 'video' => 7, 'video-depth' => 8, 'audio' => 9, 'source' => 10, 'container' => 11, 'crc32' => 12, 'ep' => 13, 'volume' => 14, 'collection' => 15, 'date_created' => 16, 'last_updated' => 17, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+        self::TYPE_PHPNAME       => array('TorrentId' => 0, 'Name' => 1, 'Type' => 2, 'Group' => 3, 'Unparsed' => 4, 'Resolution' => 5, 'Video' => 6, 'VideoDepth' => 7, 'Audio' => 8, 'Source' => 9, 'Container' => 10, 'Crc32' => 11, 'Ep' => 12, 'Volume' => 13, 'Collection' => 14, 'DateCreated' => 15, 'LastUpdated' => 16, ),
+        self::TYPE_CAMELNAME     => array('torrentId' => 0, 'name' => 1, 'type' => 2, 'group' => 3, 'unparsed' => 4, 'resolution' => 5, 'video' => 6, 'videoDepth' => 7, 'audio' => 8, 'source' => 9, 'container' => 10, 'crc32' => 11, 'ep' => 12, 'volume' => 13, 'collection' => 14, 'dateCreated' => 15, 'lastUpdated' => 16, ),
+        self::TYPE_COLNAME       => array(TorrentMetadataTableMap::COL_TORRENT_ID => 0, TorrentMetadataTableMap::COL_NAME => 1, TorrentMetadataTableMap::COL_TYPE => 2, TorrentMetadataTableMap::COL_GROUP => 3, TorrentMetadataTableMap::COL_UNPARSED => 4, TorrentMetadataTableMap::COL_RESOLUTION => 5, TorrentMetadataTableMap::COL_VIDEO => 6, TorrentMetadataTableMap::COL_VIDEO_DEPTH => 7, TorrentMetadataTableMap::COL_AUDIO => 8, TorrentMetadataTableMap::COL_SOURCE => 9, TorrentMetadataTableMap::COL_CONTAINER => 10, TorrentMetadataTableMap::COL_CRC32 => 11, TorrentMetadataTableMap::COL_EP => 12, TorrentMetadataTableMap::COL_VOLUME => 13, TorrentMetadataTableMap::COL_COLLECTION => 14, TorrentMetadataTableMap::COL_DATE_CREATED => 15, TorrentMetadataTableMap::COL_LAST_UPDATED => 16, ),
+        self::TYPE_FIELDNAME     => array('torrent_id' => 0, 'name' => 1, 'type' => 2, 'group' => 3, 'unparsed' => 4, 'resolution' => 5, 'video' => 6, 'video_depth' => 7, 'audio' => 8, 'source' => 9, 'container' => 10, 'crc32' => 11, 'ep' => 12, 'volume' => 13, 'collection' => 14, 'date_created' => 15, 'last_updated' => 16, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
     /**
@@ -206,20 +201,19 @@ class TorrentMetadataTableMap extends TableMap
         // attributes
         $this->setName('torrent_metadata');
         $this->setPhpName('TorrentMetadata');
-        $this->setIdentifierQuoting(false);
+        $this->setIdentifierQuoting(true);
         $this->setClassName('\\Odango\\Hebi\\Model\\TorrentMetadata');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'BIGINT', true, null, null);
-        $this->addForeignKey('torrent_id', 'TorrentId', 'BIGINT', 'torrent', 'id', true, null, null);
+        $this->addForeignPrimaryKey('torrent_id', 'TorrentId', 'BIGINT' , 'torrent', 'id', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, 255, null);
         $this->addColumn('type', 'Type', 'VARCHAR', false, 255, null);
         $this->addColumn('group', 'Group', 'VARCHAR', false, 255, null);
         $this->addColumn('unparsed', 'Unparsed', 'ARRAY', false, null, null);
         $this->addColumn('resolution', 'Resolution', 'VARCHAR', false, 255, null);
         $this->addColumn('video', 'Video', 'VARCHAR', false, 255, null);
-        $this->addColumn('video-depth', 'Video-depth', 'VARCHAR', false, 255, null);
+        $this->addColumn('video_depth', 'VideoDepth', 'VARCHAR', false, 255, null);
         $this->addColumn('audio', 'Audio', 'VARCHAR', false, 255, null);
         $this->addColumn('source', 'Source', 'VARCHAR', false, 255, null);
         $this->addColumn('container', 'Container', 'VARCHAR', false, 255, null);
@@ -274,11 +268,11 @@ class TorrentMetadataTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -298,7 +292,7 @@ class TorrentMetadataTableMap extends TableMap
         return (string) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
 
@@ -399,7 +393,6 @@ class TorrentMetadataTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TorrentMetadataTableMap::COL_ID);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_TORRENT_ID);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_NAME);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_TYPE);
@@ -407,7 +400,7 @@ class TorrentMetadataTableMap extends TableMap
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_UNPARSED);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_RESOLUTION);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_VIDEO);
-            $criteria->addSelectColumn(TorrentMetadataTableMap::COL_VIDEO-DEPTH);
+            $criteria->addSelectColumn(TorrentMetadataTableMap::COL_VIDEO_DEPTH);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_AUDIO);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_SOURCE);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_CONTAINER);
@@ -418,7 +411,6 @@ class TorrentMetadataTableMap extends TableMap
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_DATE_CREATED);
             $criteria->addSelectColumn(TorrentMetadataTableMap::COL_LAST_UPDATED);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.torrent_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.type');
@@ -426,7 +418,7 @@ class TorrentMetadataTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.unparsed');
             $criteria->addSelectColumn($alias . '.resolution');
             $criteria->addSelectColumn($alias . '.video');
-            $criteria->addSelectColumn($alias . '.video-depth');
+            $criteria->addSelectColumn($alias . '.video_depth');
             $criteria->addSelectColumn($alias . '.audio');
             $criteria->addSelectColumn($alias . '.source');
             $criteria->addSelectColumn($alias . '.container');
@@ -487,7 +479,7 @@ class TorrentMetadataTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(TorrentMetadataTableMap::DATABASE_NAME);
-            $criteria->add(TorrentMetadataTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(TorrentMetadataTableMap::COL_TORRENT_ID, (array) $values, Criteria::IN);
         }
 
         $query = TorrentMetadataQuery::create()->mergeWith($criteria);
@@ -533,10 +525,6 @@ class TorrentMetadataTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from TorrentMetadata object
-        }
-
-        if ($criteria->containsKey(TorrentMetadataTableMap::COL_ID) && $criteria->keyContainsValue(TorrentMetadataTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TorrentMetadataTableMap::COL_ID.')');
         }
 
 

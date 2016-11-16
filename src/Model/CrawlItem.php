@@ -16,5 +16,8 @@ use Odango\Hebi\Model\Base\CrawlItem as BaseCrawlItem;
  */
 class CrawlItem extends BaseCrawlItem
 {
-
+    public function fail($con = null) {
+        $this->setStatus('failed');
+        $this->save($con);
+    }
 }

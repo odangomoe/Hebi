@@ -20,7 +20,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildTorrentStatusQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildTorrentStatusQuery orderByTorrentId($order = Criteria::ASC) Order by the torrent_id column
  * @method     ChildTorrentStatusQuery orderBySeeders($order = Criteria::ASC) Order by the seeders column
  * @method     ChildTorrentStatusQuery orderByLeechers($order = Criteria::ASC) Order by the leechers column
@@ -28,7 +27,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatusQuery orderByLastUpdated($order = Criteria::ASC) Order by the last_updated column
  * @method     ChildTorrentStatusQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
- * @method     ChildTorrentStatusQuery groupById() Group by the id column
  * @method     ChildTorrentStatusQuery groupByTorrentId() Group by the torrent_id column
  * @method     ChildTorrentStatusQuery groupBySeeders() Group by the seeders column
  * @method     ChildTorrentStatusQuery groupByLeechers() Group by the leechers column
@@ -59,7 +57,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatus findOne(ConnectionInterface $con = null) Return the first ChildTorrentStatus matching the query
  * @method     ChildTorrentStatus findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTorrentStatus matching the query, or a new ChildTorrentStatus object populated from the query conditions when no match is found
  *
- * @method     ChildTorrentStatus findOneById(string $id) Return the first ChildTorrentStatus filtered by the id column
  * @method     ChildTorrentStatus findOneByTorrentId(string $torrent_id) Return the first ChildTorrentStatus filtered by the torrent_id column
  * @method     ChildTorrentStatus findOneBySeeders(string $seeders) Return the first ChildTorrentStatus filtered by the seeders column
  * @method     ChildTorrentStatus findOneByLeechers(string $leechers) Return the first ChildTorrentStatus filtered by the leechers column
@@ -70,7 +67,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatus requirePk($key, ConnectionInterface $con = null) Return the ChildTorrentStatus by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOne(ConnectionInterface $con = null) Return the first ChildTorrentStatus matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTorrentStatus requireOneById(string $id) Return the first ChildTorrentStatus filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneByTorrentId(string $torrent_id) Return the first ChildTorrentStatus filtered by the torrent_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneBySeeders(string $seeders) Return the first ChildTorrentStatus filtered by the seeders column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneByLeechers(string $leechers) Return the first ChildTorrentStatus filtered by the leechers column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -79,7 +75,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatus requireOneByCreatedAt(string $created_at) Return the first ChildTorrentStatus filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTorrentStatus[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTorrentStatus objects based on current ModelCriteria
- * @method     ChildTorrentStatus[]|ObjectCollection findById(string $id) Return ChildTorrentStatus objects filtered by the id column
  * @method     ChildTorrentStatus[]|ObjectCollection findByTorrentId(string $torrent_id) Return ChildTorrentStatus objects filtered by the torrent_id column
  * @method     ChildTorrentStatus[]|ObjectCollection findBySeeders(string $seeders) Return ChildTorrentStatus objects filtered by the seeders column
  * @method     ChildTorrentStatus[]|ObjectCollection findByLeechers(string $leechers) Return ChildTorrentStatus objects filtered by the leechers column
@@ -184,7 +179,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, torrent_id, seeders, leechers, downloaded, last_updated, created_at FROM torrent_status WHERE id = :p0';
+        $sql = 'SELECT `torrent_id`, `seeders`, `leechers`, `downloaded`, `last_updated`, `created_at` FROM `torrent_status` WHERE `torrent_id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -258,7 +253,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(TorrentStatusTableMap::COL_TORRENT_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -271,48 +266,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTorrentStatusQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(TorrentStatusTableMap::COL_TORRENT_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -654,7 +608,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
     public function prune($torrentStatus = null)
     {
         if ($torrentStatus) {
-            $this->addUsingAlias(TorrentStatusTableMap::COL_ID, $torrentStatus->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(TorrentStatusTableMap::COL_TORRENT_ID, $torrentStatus->getTorrentId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

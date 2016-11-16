@@ -65,13 +65,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     *
-     * @var        string
-     */
-    protected $id;
-
-    /**
      * The value for the torrent_id field.
      *
      * @var        string
@@ -352,16 +345,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [torrent_id] column value.
      *
      * @return string
@@ -440,26 +423,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
             return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
         }
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param string $v new value
-     * @return $this|\Odango\Hebi\Model\TorrentStatus The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[TorrentStatusTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [torrent_id] column.
@@ -621,28 +584,25 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TorrentStatusTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TorrentStatusTableMap::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TorrentStatusTableMap::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->torrent_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TorrentStatusTableMap::translateFieldName('Seeders', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TorrentStatusTableMap::translateFieldName('Seeders', TableMap::TYPE_PHPNAME, $indexType)];
             $this->seeders = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TorrentStatusTableMap::translateFieldName('Leechers', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TorrentStatusTableMap::translateFieldName('Leechers', TableMap::TYPE_PHPNAME, $indexType)];
             $this->leechers = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TorrentStatusTableMap::translateFieldName('Downloaded', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TorrentStatusTableMap::translateFieldName('Downloaded', TableMap::TYPE_PHPNAME, $indexType)];
             $this->downloaded = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TorrentStatusTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TorrentStatusTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->last_updated = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentStatusTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TorrentStatusTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -655,7 +615,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = TorrentStatusTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = TorrentStatusTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\TorrentStatus'), 0, $e);
@@ -874,36 +834,29 @@ abstract class TorrentStatus implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TorrentStatusTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TorrentStatusTableMap::COL_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TorrentStatusTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_TORRENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'torrent_id';
+            $modifiedColumns[':p' . $index++]  = '`torrent_id`';
         }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_SEEDERS)) {
-            $modifiedColumns[':p' . $index++]  = 'seeders';
+            $modifiedColumns[':p' . $index++]  = '`seeders`';
         }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_LEECHERS)) {
-            $modifiedColumns[':p' . $index++]  = 'leechers';
+            $modifiedColumns[':p' . $index++]  = '`leechers`';
         }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_DOWNLOADED)) {
-            $modifiedColumns[':p' . $index++]  = 'downloaded';
+            $modifiedColumns[':p' . $index++]  = '`downloaded`';
         }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_LAST_UPDATED)) {
-            $modifiedColumns[':p' . $index++]  = 'last_updated';
+            $modifiedColumns[':p' . $index++]  = '`last_updated`';
         }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'created_at';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
 
         $sql = sprintf(
-            'INSERT INTO torrent_status (%s) VALUES (%s)',
+            'INSERT INTO `torrent_status` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -912,25 +865,22 @@ abstract class TorrentStatus implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case 'torrent_id':
+                    case '`torrent_id`':
                         $stmt->bindValue($identifier, $this->torrent_id, PDO::PARAM_INT);
                         break;
-                    case 'seeders':
+                    case '`seeders`':
                         $stmt->bindValue($identifier, $this->seeders, PDO::PARAM_INT);
                         break;
-                    case 'leechers':
+                    case '`leechers`':
                         $stmt->bindValue($identifier, $this->leechers, PDO::PARAM_INT);
                         break;
-                    case 'downloaded':
+                    case '`downloaded`':
                         $stmt->bindValue($identifier, $this->downloaded, PDO::PARAM_INT);
                         break;
-                    case 'last_updated':
+                    case '`last_updated`':
                         $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
-                    case 'created_at':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -940,13 +890,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -996,24 +939,21 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getTorrentId();
                 break;
-            case 2:
+            case 1:
                 return $this->getSeeders();
                 break;
-            case 3:
+            case 2:
                 return $this->getLeechers();
                 break;
-            case 4:
+            case 3:
                 return $this->getDownloaded();
                 break;
-            case 5:
+            case 4:
                 return $this->getLastUpdated();
                 break;
-            case 6:
+            case 5:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -1046,20 +986,19 @@ abstract class TorrentStatus implements ActiveRecordInterface
         $alreadyDumpedObjects['TorrentStatus'][$this->hashCode()] = true;
         $keys = TorrentStatusTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getTorrentId(),
-            $keys[2] => $this->getSeeders(),
-            $keys[3] => $this->getLeechers(),
-            $keys[4] => $this->getDownloaded(),
-            $keys[5] => $this->getLastUpdated(),
-            $keys[6] => $this->getCreatedAt(),
+            $keys[0] => $this->getTorrentId(),
+            $keys[1] => $this->getSeeders(),
+            $keys[2] => $this->getLeechers(),
+            $keys[3] => $this->getDownloaded(),
+            $keys[4] => $this->getLastUpdated(),
+            $keys[5] => $this->getCreatedAt(),
         );
-        if ($result[$keys[5]] instanceof \DateTime) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        if ($result[$keys[4]] instanceof \DateTime) {
+            $result[$keys[4]] = $result[$keys[4]]->format('c');
         }
 
-        if ($result[$keys[6]] instanceof \DateTime) {
-            $result[$keys[6]] = $result[$keys[6]]->format('c');
+        if ($result[$keys[5]] instanceof \DateTime) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1118,24 +1057,21 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setTorrentId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setSeeders($value);
                 break;
-            case 3:
+            case 2:
                 $this->setLeechers($value);
                 break;
-            case 4:
+            case 3:
                 $this->setDownloaded($value);
                 break;
-            case 5:
+            case 4:
                 $this->setLastUpdated($value);
                 break;
-            case 6:
+            case 5:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -1165,25 +1101,22 @@ abstract class TorrentStatus implements ActiveRecordInterface
         $keys = TorrentStatusTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setTorrentId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setTorrentId($arr[$keys[1]]);
+            $this->setSeeders($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setSeeders($arr[$keys[2]]);
+            $this->setLeechers($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setLeechers($arr[$keys[3]]);
+            $this->setDownloaded($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setDownloaded($arr[$keys[4]]);
+            $this->setLastUpdated($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setLastUpdated($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setCreatedAt($arr[$keys[6]]);
+            $this->setCreatedAt($arr[$keys[5]]);
         }
     }
 
@@ -1226,9 +1159,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         $criteria = new Criteria(TorrentStatusTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TorrentStatusTableMap::COL_ID)) {
-            $criteria->add(TorrentStatusTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(TorrentStatusTableMap::COL_TORRENT_ID)) {
             $criteria->add(TorrentStatusTableMap::COL_TORRENT_ID, $this->torrent_id);
         }
@@ -1264,7 +1194,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildTorrentStatusQuery::create();
-        $criteria->add(TorrentStatusTableMap::COL_ID, $this->id);
+        $criteria->add(TorrentStatusTableMap::COL_TORRENT_ID, $this->torrent_id);
 
         return $criteria;
     }
@@ -1277,10 +1207,17 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId();
+        $validPk = null !== $this->getTorrentId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation torrent_status_fk_693b7d to table torrent
+        if ($this->aTorrent && $hash = spl_object_hash($this->aTorrent)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1297,18 +1234,18 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        return $this->getTorrentId();
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Generic method to set the primary key (torrent_id column).
      *
      * @param       string $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setId($key);
+        $this->setTorrentId($key);
     }
 
     /**
@@ -1317,7 +1254,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getId();
+        return null === $this->getTorrentId();
     }
 
     /**
@@ -1341,7 +1278,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
         $copyObj->setCreatedAt($this->getCreatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1384,10 +1320,9 @@ abstract class TorrentStatus implements ActiveRecordInterface
 
         $this->aTorrent = $v;
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTorrent object, it will not be re-added.
+        // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->addTorrentStatus($this);
+            $v->setTorrentStatus($this);
         }
 
 
@@ -1406,13 +1341,8 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         if ($this->aTorrent === null && (($this->torrent_id !== "" && $this->torrent_id !== null))) {
             $this->aTorrent = ChildTorrentQuery::create()->findPk($this->torrent_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aTorrent->addTorrentStatuses($this);
-             */
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aTorrent->setTorrentStatus($this);
         }
 
         return $this->aTorrent;
@@ -1428,7 +1358,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
         if (null !== $this->aTorrent) {
             $this->aTorrent->removeTorrentStatus($this);
         }
-        $this->id = null;
         $this->torrent_id = null;
         $this->seeders = null;
         $this->leechers = null;

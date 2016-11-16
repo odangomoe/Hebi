@@ -16,5 +16,14 @@ use Odango\Hebi\Model\Base\Torrent as BaseTorrent;
  */
 class Torrent extends BaseTorrent
 {
+    public function createMetadata() {
+        $metadata = $this->getTorrentMetadata();
+        if ($metadata === null) {
+            $metadata = new TorrentMetadata();
+            $metadata->setTorrent($this);
+        }
 
+        $metadata->applyTitle($this->getTorrentTitle());
+        $metadata->save();
+    }
 }

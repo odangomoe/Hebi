@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+include __DIR__ . '/../vendor/autoload.php';
+
+$main = new \Odango\Hebi\Main();
+
+if (count($argv) < 2) {
+    echo "No action given\n";
+    exit(1);
+}
+
+$main->run($argv[1]);

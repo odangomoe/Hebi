@@ -59,7 +59,7 @@ class TorrentTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class TorrentTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the id field
@@ -112,11 +112,6 @@ class TorrentTableMap extends TableMap
     const COL_LAST_UPDATED = 'torrent.last_updated';
 
     /**
-     * the column name for the crawl_item_id field
-     */
-    const COL_CRAWL_ITEM_ID = 'torrent.crawl_item_id';
-
-    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -128,11 +123,11 @@ class TorrentTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'InfoHash', 'CachedTorrentFile', 'TorrentTitle', 'SubmitterId', 'Trackers', 'DateCrawled', 'LastUpdated', 'CrawlItemId', ),
-        self::TYPE_CAMELNAME     => array('id', 'infoHash', 'cachedTorrentFile', 'torrentTitle', 'submitterId', 'trackers', 'dateCrawled', 'lastUpdated', 'crawlItemId', ),
-        self::TYPE_COLNAME       => array(TorrentTableMap::COL_ID, TorrentTableMap::COL_INFO_HASH, TorrentTableMap::COL_CACHED_TORRENT_FILE, TorrentTableMap::COL_TORRENT_TITLE, TorrentTableMap::COL_SUBMITTER_ID, TorrentTableMap::COL_TRACKERS, TorrentTableMap::COL_DATE_CRAWLED, TorrentTableMap::COL_LAST_UPDATED, TorrentTableMap::COL_CRAWL_ITEM_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'info_hash', 'cached_torrent_file', 'torrent_title', 'submitter_id', 'trackers', 'date_crawled', 'last_updated', 'crawl_item_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'InfoHash', 'CachedTorrentFile', 'TorrentTitle', 'SubmitterId', 'Trackers', 'DateCrawled', 'LastUpdated', ),
+        self::TYPE_CAMELNAME     => array('id', 'infoHash', 'cachedTorrentFile', 'torrentTitle', 'submitterId', 'trackers', 'dateCrawled', 'lastUpdated', ),
+        self::TYPE_COLNAME       => array(TorrentTableMap::COL_ID, TorrentTableMap::COL_INFO_HASH, TorrentTableMap::COL_CACHED_TORRENT_FILE, TorrentTableMap::COL_TORRENT_TITLE, TorrentTableMap::COL_SUBMITTER_ID, TorrentTableMap::COL_TRACKERS, TorrentTableMap::COL_DATE_CRAWLED, TorrentTableMap::COL_LAST_UPDATED, ),
+        self::TYPE_FIELDNAME     => array('id', 'info_hash', 'cached_torrent_file', 'torrent_title', 'submitter_id', 'trackers', 'date_crawled', 'last_updated', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -142,11 +137,11 @@ class TorrentTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'InfoHash' => 1, 'CachedTorrentFile' => 2, 'TorrentTitle' => 3, 'SubmitterId' => 4, 'Trackers' => 5, 'DateCrawled' => 6, 'LastUpdated' => 7, 'CrawlItemId' => 8, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'infoHash' => 1, 'cachedTorrentFile' => 2, 'torrentTitle' => 3, 'submitterId' => 4, 'trackers' => 5, 'dateCrawled' => 6, 'lastUpdated' => 7, 'crawlItemId' => 8, ),
-        self::TYPE_COLNAME       => array(TorrentTableMap::COL_ID => 0, TorrentTableMap::COL_INFO_HASH => 1, TorrentTableMap::COL_CACHED_TORRENT_FILE => 2, TorrentTableMap::COL_TORRENT_TITLE => 3, TorrentTableMap::COL_SUBMITTER_ID => 4, TorrentTableMap::COL_TRACKERS => 5, TorrentTableMap::COL_DATE_CRAWLED => 6, TorrentTableMap::COL_LAST_UPDATED => 7, TorrentTableMap::COL_CRAWL_ITEM_ID => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'info_hash' => 1, 'cached_torrent_file' => 2, 'torrent_title' => 3, 'submitter_id' => 4, 'trackers' => 5, 'date_crawled' => 6, 'last_updated' => 7, 'crawl_item_id' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'InfoHash' => 1, 'CachedTorrentFile' => 2, 'TorrentTitle' => 3, 'SubmitterId' => 4, 'Trackers' => 5, 'DateCrawled' => 6, 'LastUpdated' => 7, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'infoHash' => 1, 'cachedTorrentFile' => 2, 'torrentTitle' => 3, 'submitterId' => 4, 'trackers' => 5, 'dateCrawled' => 6, 'lastUpdated' => 7, ),
+        self::TYPE_COLNAME       => array(TorrentTableMap::COL_ID => 0, TorrentTableMap::COL_INFO_HASH => 1, TorrentTableMap::COL_CACHED_TORRENT_FILE => 2, TorrentTableMap::COL_TORRENT_TITLE => 3, TorrentTableMap::COL_SUBMITTER_ID => 4, TorrentTableMap::COL_TRACKERS => 5, TorrentTableMap::COL_DATE_CRAWLED => 6, TorrentTableMap::COL_LAST_UPDATED => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'info_hash' => 1, 'cached_torrent_file' => 2, 'torrent_title' => 3, 'submitter_id' => 4, 'trackers' => 5, 'date_crawled' => 6, 'last_updated' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -161,12 +156,12 @@ class TorrentTableMap extends TableMap
         // attributes
         $this->setName('torrent');
         $this->setPhpName('Torrent');
-        $this->setIdentifierQuoting(false);
+        $this->setIdentifierQuoting(true);
         $this->setClassName('\\Odango\\Hebi\\Model\\Torrent');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'BIGINT', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'BIGINT' , 'crawl_item', 'id', true, null, null);
         $this->addColumn('info_hash', 'InfoHash', 'VARCHAR', true, 32, null);
         $this->addColumn('cached_torrent_file', 'CachedTorrentFile', 'LONGVARCHAR', false, null, null);
         $this->addColumn('torrent_title', 'TorrentTitle', 'LONGVARCHAR', false, null, null);
@@ -174,7 +169,6 @@ class TorrentTableMap extends TableMap
         $this->addColumn('trackers', 'Trackers', 'ARRAY', false, null, null);
         $this->addColumn('date_crawled', 'DateCrawled', 'TIMESTAMP', false, null, null);
         $this->addColumn('last_updated', 'LastUpdated', 'TIMESTAMP', false, null, null);
-        $this->addForeignKey('crawl_item_id', 'CrawlItemId', 'BIGINT', 'crawl_item', 'id', false, null, null);
     } // initialize()
 
     /**
@@ -185,24 +179,24 @@ class TorrentTableMap extends TableMap
         $this->addRelation('CrawlItem', '\\Odango\\Hebi\\Model\\CrawlItem', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':crawl_item_id',
+    0 => ':id',
     1 => ':id',
   ),
 ), null, null, null, false);
-        $this->addRelation('TorrentStatus', '\\Odango\\Hebi\\Model\\TorrentStatus', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('TorrentStatus', '\\Odango\\Hebi\\Model\\TorrentStatus', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':torrent_id',
     1 => ':id',
   ),
-), null, null, 'TorrentStatuses', false);
-        $this->addRelation('TorrentMetadata', '\\Odango\\Hebi\\Model\\TorrentMetadata', RelationMap::ONE_TO_MANY, array (
+), null, null, null, false);
+        $this->addRelation('TorrentMetadata', '\\Odango\\Hebi\\Model\\TorrentMetadata', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':torrent_id',
     1 => ':id',
   ),
-), null, null, 'TorrentMetadatas', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -367,7 +361,6 @@ class TorrentTableMap extends TableMap
             $criteria->addSelectColumn(TorrentTableMap::COL_TRACKERS);
             $criteria->addSelectColumn(TorrentTableMap::COL_DATE_CRAWLED);
             $criteria->addSelectColumn(TorrentTableMap::COL_LAST_UPDATED);
-            $criteria->addSelectColumn(TorrentTableMap::COL_CRAWL_ITEM_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.info_hash');
@@ -377,7 +370,6 @@ class TorrentTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.trackers');
             $criteria->addSelectColumn($alias . '.date_crawled');
             $criteria->addSelectColumn($alias . '.last_updated');
-            $criteria->addSelectColumn($alias . '.crawl_item_id');
         }
     }
 
@@ -475,10 +467,6 @@ class TorrentTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Torrent object
-        }
-
-        if ($criteria->containsKey(TorrentTableMap::COL_ID) && $criteria->keyContainsValue(TorrentTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TorrentTableMap::COL_ID.')');
         }
 
 

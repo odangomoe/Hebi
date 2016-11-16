@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<database name="default" namespace="Odango\Hebi\Model">
+<database name="default" namespace="Odango\Hebi\Model" identifierQuoting="true">
     <table name="crawl_item">
         <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
         <column name="target" type="varchar" size="255" />
-        <column name="external_id" type="varchar" size="255" />
+        <column name="external_id" type="BIGINT" />
         <column name="status" type="varchar" size="50" />
         <column name="type" type="varchar" size="50" />
         <column name="last_updated" type="timestamp" />
@@ -28,7 +28,7 @@
         </behavior>
     </table>
     <table name="torrent">
-        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
+        <column name="id" type="BIGINT" primaryKey="true" />
         <column name="info_hash" type="varchar" size="32" required="true" />
         <column name="cached_torrent_file" type="LONGVARCHAR" />
         <column name="torrent_title" type="LONGVARCHAR" />
@@ -37,10 +37,8 @@
         <column name="date_crawled" type="timestamp"/>
         <column name="last_updated" type="timestamp"/>
 
-        <column name="crawl_item_id" type="bigint" />
-
         <foreign-key foreignTable="crawl_item">
-            <reference foreign="id" local="crawl_item_id"/>
+            <reference foreign="id" local="id"/>
         </foreign-key>
 
         <behavior name="timestampable">
@@ -49,8 +47,7 @@
         </behavior>
     </table>
     <table name="torrent_status">
-        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
-        <column name="torrent_id" type="BIGINT" required="true" />
+        <column name="torrent_id" type="BIGINT" required="true" primaryKey="true"  />
 
         <column name="seeders" type="bigint" />
         <column name="leechers" type="bigint" />
@@ -67,8 +64,7 @@
         </behavior>
     </table>
     <table name="torrent_metadata">
-        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
-        <column name="torrent_id" type="BIGINT" required="true" />
+        <column name="torrent_id" type="BIGINT" required="true" primaryKey="true" />
 
         <column name="name" type="LONGVARCHAR" size="255" />
         <column name="type" type="varchar" size="255" />
@@ -76,7 +72,7 @@
         <column name="unparsed" type="array" />
         <column name="resolution" type="varchar" size="255" />
         <column name="video" type="varchar" size="255" />
-        <column name="video-depth" type="varchar" size="255" />
+        <column name="video_depth" type="varchar" size="255" />
         <column name="audio" type="varchar" size="255" />
         <column name="source" type="varchar" size="255" />
         <column name="container" type="varchar" size="255" />

@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Odango\Hebo\Test\Nyaa;
+namespace Odango\Hebi\Test\Nyaa;
 
 
-use Nyaa\TorrentReader;
+use Odango\Hebi\Nyaa\TorrentReader;
 
 class TorrentReaderTest extends \PHPUnit_Framework_TestCase
 {

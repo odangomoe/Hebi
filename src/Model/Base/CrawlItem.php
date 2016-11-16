@@ -10,13 +10,11 @@ use Odango\Hebi\Model\CrawlItemQuery as ChildCrawlItemQuery;
 use Odango\Hebi\Model\Torrent as ChildTorrent;
 use Odango\Hebi\Model\TorrentQuery as ChildTorrentQuery;
 use Odango\Hebi\Model\Map\CrawlItemTableMap;
-use Odango\Hebi\Model\Map\TorrentTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -123,10 +121,9 @@ abstract class CrawlItem implements ActiveRecordInterface
     protected $created_at;
 
     /**
-     * @var        ObjectCollection|ChildTorrent[] Collection to store aggregation of ChildTorrent objects.
+     * @var        ChildTorrent one-to-one related ChildTorrent object
      */
-    protected $collTorrents;
-    protected $collTorrentsPartial;
+    protected $singleTorrent;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -135,12 +132,6 @@ abstract class CrawlItem implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTorrent[]
-     */
-    protected $torrentsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Odango\Hebi\Model\Base\CrawlItem object.
@@ -774,7 +765,7 @@ abstract class CrawlItem implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collTorrents = null;
+            $this->singleTorrent = null;
 
         } // if (deep)
     }
@@ -898,21 +889,9 @@ abstract class CrawlItem implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->torrentsScheduledForDeletion !== null) {
-                if (!$this->torrentsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->torrentsScheduledForDeletion as $torrent) {
-                        // need to save related object because we set the relation to null
-                        $torrent->save($con);
-                    }
-                    $this->torrentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTorrents !== null) {
-                foreach ($this->collTorrents as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
+            if ($this->singleTorrent !== null) {
+                if (!$this->singleTorrent->isDeleted() && ($this->singleTorrent->isNew() || $this->singleTorrent->isModified())) {
+                    $affectedRows += $this->singleTorrent->save($con);
                 }
             }
 
@@ -943,32 +922,32 @@ abstract class CrawlItem implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CrawlItemTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_TARGET)) {
-            $modifiedColumns[':p' . $index++]  = 'target';
+            $modifiedColumns[':p' . $index++]  = '`target`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_EXTERNAL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'external_id';
+            $modifiedColumns[':p' . $index++]  = '`external_id`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_STATUS)) {
-            $modifiedColumns[':p' . $index++]  = 'status';
+            $modifiedColumns[':p' . $index++]  = '`status`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_TYPE)) {
-            $modifiedColumns[':p' . $index++]  = 'type';
+            $modifiedColumns[':p' . $index++]  = '`type`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_LAST_UPDATED)) {
-            $modifiedColumns[':p' . $index++]  = 'last_updated';
+            $modifiedColumns[':p' . $index++]  = '`last_updated`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_LAST_SUCCESS)) {
-            $modifiedColumns[':p' . $index++]  = 'last_success';
+            $modifiedColumns[':p' . $index++]  = '`last_success`';
         }
         if ($this->isColumnModified(CrawlItemTableMap::COL_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'created_at';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
 
         $sql = sprintf(
-            'INSERT INTO crawl_item (%s) VALUES (%s)',
+            'INSERT INTO `crawl_item` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -977,28 +956,28 @@ abstract class CrawlItem implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'target':
+                    case '`target`':
                         $stmt->bindValue($identifier, $this->target, PDO::PARAM_STR);
                         break;
-                    case 'external_id':
-                        $stmt->bindValue($identifier, $this->external_id, PDO::PARAM_STR);
+                    case '`external_id`':
+                        $stmt->bindValue($identifier, $this->external_id, PDO::PARAM_INT);
                         break;
-                    case 'status':
+                    case '`status`':
                         $stmt->bindValue($identifier, $this->status, PDO::PARAM_STR);
                         break;
-                    case 'type':
+                    case '`type`':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
                         break;
-                    case 'last_updated':
+                    case '`last_updated`':
                         $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
-                    case 'last_success':
+                    case '`last_success`':
                         $stmt->bindValue($identifier, $this->last_success ? $this->last_success->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
-                    case 'created_at':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -1144,20 +1123,20 @@ abstract class CrawlItem implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collTorrents) {
+            if (null !== $this->singleTorrent) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'torrents';
+                        $key = 'torrent';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'torrents';
+                        $key = 'torrent';
                         break;
                     default:
-                        $key = 'Torrents';
+                        $key = 'Torrent';
                 }
 
-                $result[$key] = $this->collTorrents->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->singleTorrent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -1431,10 +1410,9 @@ abstract class CrawlItem implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getTorrents() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTorrent($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getTorrent();
+            if ($relObj) {
+                $copyObj->setTorrent($relObj->copy($deepCopy));
             }
 
         } // if ($deepCopy)
@@ -1478,231 +1456,39 @@ abstract class CrawlItem implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Torrent' == $relationName) {
-            return $this->initTorrents();
-        }
     }
 
     /**
-     * Clears out the collTorrents collection
+     * Gets a single ChildTorrent object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTorrents()
-     */
-    public function clearTorrents()
-    {
-        $this->collTorrents = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTorrents collection loaded partially.
-     */
-    public function resetPartialTorrents($v = true)
-    {
-        $this->collTorrentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collTorrents collection.
-     *
-     * By default this just sets the collTorrents collection to an empty array (like clearcollTorrents());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTorrents($overrideExisting = true)
-    {
-        if (null !== $this->collTorrents && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = TorrentTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collTorrents = new $collectionClassName;
-        $this->collTorrents->setModel('\Odango\Hebi\Model\Torrent');
-    }
-
-    /**
-     * Gets an array of ChildTorrent objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCrawlItem is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTorrent[] List of ChildTorrent objects
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildTorrent
      * @throws PropelException
      */
-    public function getTorrents(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getTorrent(ConnectionInterface $con = null)
     {
-        $partial = $this->collTorrentsPartial && !$this->isNew();
-        if (null === $this->collTorrents || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTorrents) {
-                // return empty collection
-                $this->initTorrents();
-            } else {
-                $collTorrents = ChildTorrentQuery::create(null, $criteria)
-                    ->filterByCrawlItem($this)
-                    ->find($con);
 
-                if (null !== $criteria) {
-                    if (false !== $this->collTorrentsPartial && count($collTorrents)) {
-                        $this->initTorrents(false);
-
-                        foreach ($collTorrents as $obj) {
-                            if (false == $this->collTorrents->contains($obj)) {
-                                $this->collTorrents->append($obj);
-                            }
-                        }
-
-                        $this->collTorrentsPartial = true;
-                    }
-
-                    return $collTorrents;
-                }
-
-                if ($partial && $this->collTorrents) {
-                    foreach ($this->collTorrents as $obj) {
-                        if ($obj->isNew()) {
-                            $collTorrents[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTorrents = $collTorrents;
-                $this->collTorrentsPartial = false;
-            }
+        if ($this->singleTorrent === null && !$this->isNew()) {
+            $this->singleTorrent = ChildTorrentQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collTorrents;
+        return $this->singleTorrent;
     }
 
     /**
-     * Sets a collection of ChildTorrent objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single ChildTorrent object as related to this object by a one-to-one relationship.
      *
-     * @param      Collection $torrents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCrawlItem The current object (for fluent API support)
-     */
-    public function setTorrents(Collection $torrents, ConnectionInterface $con = null)
-    {
-        /** @var ChildTorrent[] $torrentsToDelete */
-        $torrentsToDelete = $this->getTorrents(new Criteria(), $con)->diff($torrents);
-
-
-        $this->torrentsScheduledForDeletion = $torrentsToDelete;
-
-        foreach ($torrentsToDelete as $torrentRemoved) {
-            $torrentRemoved->setCrawlItem(null);
-        }
-
-        $this->collTorrents = null;
-        foreach ($torrents as $torrent) {
-            $this->addTorrent($torrent);
-        }
-
-        $this->collTorrents = $torrents;
-        $this->collTorrentsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Torrent objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Torrent objects.
-     * @throws PropelException
-     */
-    public function countTorrents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTorrentsPartial && !$this->isNew();
-        if (null === $this->collTorrents || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTorrents) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getTorrents());
-            }
-
-            $query = ChildTorrentQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCrawlItem($this)
-                ->count($con);
-        }
-
-        return count($this->collTorrents);
-    }
-
-    /**
-     * Method called to associate a ChildTorrent object to this object
-     * through the ChildTorrent foreign key attribute.
-     *
-     * @param  ChildTorrent $l ChildTorrent
+     * @param  ChildTorrent $v ChildTorrent
      * @return $this|\Odango\Hebi\Model\CrawlItem The current object (for fluent API support)
+     * @throws PropelException
      */
-    public function addTorrent(ChildTorrent $l)
+    public function setTorrent(ChildTorrent $v = null)
     {
-        if ($this->collTorrents === null) {
-            $this->initTorrents();
-            $this->collTorrentsPartial = true;
-        }
+        $this->singleTorrent = $v;
 
-        if (!$this->collTorrents->contains($l)) {
-            $this->doAddTorrent($l);
-
-            if ($this->torrentsScheduledForDeletion and $this->torrentsScheduledForDeletion->contains($l)) {
-                $this->torrentsScheduledForDeletion->remove($this->torrentsScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTorrent $torrent The ChildTorrent object to add.
-     */
-    protected function doAddTorrent(ChildTorrent $torrent)
-    {
-        $this->collTorrents[]= $torrent;
-        $torrent->setCrawlItem($this);
-    }
-
-    /**
-     * @param  ChildTorrent $torrent The ChildTorrent object to remove.
-     * @return $this|ChildCrawlItem The current object (for fluent API support)
-     */
-    public function removeTorrent(ChildTorrent $torrent)
-    {
-        if ($this->getTorrents()->contains($torrent)) {
-            $pos = $this->collTorrents->search($torrent);
-            $this->collTorrents->remove($pos);
-            if (null === $this->torrentsScheduledForDeletion) {
-                $this->torrentsScheduledForDeletion = clone $this->collTorrents;
-                $this->torrentsScheduledForDeletion->clear();
-            }
-            $this->torrentsScheduledForDeletion[]= $torrent;
-            $torrent->setCrawlItem(null);
+        // Make sure that that the passed-in ChildTorrent isn't already associated with this object
+        if ($v !== null && $v->getCrawlItem(null, false) === null) {
+            $v->setCrawlItem($this);
         }
 
         return $this;
@@ -1741,14 +1527,12 @@ abstract class CrawlItem implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collTorrents) {
-                foreach ($this->collTorrents as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleTorrent) {
+                $this->singleTorrent->clearAllReferences($deep);
             }
         } // if ($deep)
 
-        $this->collTorrents = null;
+        $this->singleTorrent = null;
     }
 
     /**

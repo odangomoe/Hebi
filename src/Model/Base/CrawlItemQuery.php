@@ -189,7 +189,7 @@ abstract class CrawlItemQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, target, external_id, status, type, last_updated, last_success, created_at FROM crawl_item WHERE id = :p0';
+        $sql = 'SELECT `id`, `target`, `external_id`, `status`, `type`, `last_updated`, `last_success`, `created_at` FROM `crawl_item` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -350,19 +350,35 @@ abstract class CrawlItemQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterByExternalId('fooValue');   // WHERE external_id = 'fooValue'
-     * $query->filterByExternalId('%fooValue%', Criteria::LIKE); // WHERE external_id LIKE '%fooValue%'
+     * $query->filterByExternalId(1234); // WHERE external_id = 1234
+     * $query->filterByExternalId(array(12, 34)); // WHERE external_id IN (12, 34)
+     * $query->filterByExternalId(array('min' => 12)); // WHERE external_id > 12
      * </code>
      *
-     * @param     string $externalId The value to use as filter.
+     * @param     mixed $externalId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildCrawlItemQuery The current query, for fluid interface
      */
     public function filterByExternalId($externalId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($externalId)) {
+        if (is_array($externalId)) {
+            $useMinMax = false;
+            if (isset($externalId['min'])) {
+                $this->addUsingAlias(CrawlItemTableMap::COL_EXTERNAL_ID, $externalId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($externalId['max'])) {
+                $this->addUsingAlias(CrawlItemTableMap::COL_EXTERNAL_ID, $externalId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
         }
@@ -561,7 +577,7 @@ abstract class CrawlItemQuery extends ModelCriteria
     {
         if ($torrent instanceof \Odango\Hebi\Model\Torrent) {
             return $this
-                ->addUsingAlias(CrawlItemTableMap::COL_ID, $torrent->getCrawlItemId(), $comparison);
+                ->addUsingAlias(CrawlItemTableMap::COL_ID, $torrent->getId(), $comparison);
         } elseif ($torrent instanceof ObjectCollection) {
             return $this
                 ->useTorrentQuery()
@@ -580,7 +596,7 @@ abstract class CrawlItemQuery extends ModelCriteria
      *
      * @return $this|ChildCrawlItemQuery The current query, for fluid interface
      */
-    public function joinTorrent($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinTorrent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Torrent');
@@ -615,7 +631,7 @@ abstract class CrawlItemQuery extends ModelCriteria
      *
      * @return \Odango\Hebi\Model\TorrentQuery A secondary query class using the current class as primary query
      */
-    public function useTorrentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useTorrentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinTorrent($relationAlias, $joinType)

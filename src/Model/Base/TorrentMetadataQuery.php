@@ -20,7 +20,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildTorrentMetadataQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildTorrentMetadataQuery orderByTorrentId($order = Criteria::ASC) Order by the torrent_id column
  * @method     ChildTorrentMetadataQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildTorrentMetadataQuery orderByType($order = Criteria::ASC) Order by the type column
@@ -28,7 +27,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery orderByUnparsed($order = Criteria::ASC) Order by the unparsed column
  * @method     ChildTorrentMetadataQuery orderByResolution($order = Criteria::ASC) Order by the resolution column
  * @method     ChildTorrentMetadataQuery orderByVideo($order = Criteria::ASC) Order by the video column
- * @method     ChildTorrentMetadataQuery orderByVideo-depth($order = Criteria::ASC) Order by the video-depth column
+ * @method     ChildTorrentMetadataQuery orderByVideoDepth($order = Criteria::ASC) Order by the video_depth column
  * @method     ChildTorrentMetadataQuery orderByAudio($order = Criteria::ASC) Order by the audio column
  * @method     ChildTorrentMetadataQuery orderBySource($order = Criteria::ASC) Order by the source column
  * @method     ChildTorrentMetadataQuery orderByContainer($order = Criteria::ASC) Order by the container column
@@ -39,7 +38,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery orderByDateCreated($order = Criteria::ASC) Order by the date_created column
  * @method     ChildTorrentMetadataQuery orderByLastUpdated($order = Criteria::ASC) Order by the last_updated column
  *
- * @method     ChildTorrentMetadataQuery groupById() Group by the id column
  * @method     ChildTorrentMetadataQuery groupByTorrentId() Group by the torrent_id column
  * @method     ChildTorrentMetadataQuery groupByName() Group by the name column
  * @method     ChildTorrentMetadataQuery groupByType() Group by the type column
@@ -47,7 +45,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery groupByUnparsed() Group by the unparsed column
  * @method     ChildTorrentMetadataQuery groupByResolution() Group by the resolution column
  * @method     ChildTorrentMetadataQuery groupByVideo() Group by the video column
- * @method     ChildTorrentMetadataQuery groupByVideo-depth() Group by the video-depth column
+ * @method     ChildTorrentMetadataQuery groupByVideoDepth() Group by the video_depth column
  * @method     ChildTorrentMetadataQuery groupByAudio() Group by the audio column
  * @method     ChildTorrentMetadataQuery groupBySource() Group by the source column
  * @method     ChildTorrentMetadataQuery groupByContainer() Group by the container column
@@ -81,7 +79,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata findOne(ConnectionInterface $con = null) Return the first ChildTorrentMetadata matching the query
  * @method     ChildTorrentMetadata findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTorrentMetadata matching the query, or a new ChildTorrentMetadata object populated from the query conditions when no match is found
  *
- * @method     ChildTorrentMetadata findOneById(string $id) Return the first ChildTorrentMetadata filtered by the id column
  * @method     ChildTorrentMetadata findOneByTorrentId(string $torrent_id) Return the first ChildTorrentMetadata filtered by the torrent_id column
  * @method     ChildTorrentMetadata findOneByName(string $name) Return the first ChildTorrentMetadata filtered by the name column
  * @method     ChildTorrentMetadata findOneByType(string $type) Return the first ChildTorrentMetadata filtered by the type column
@@ -89,7 +86,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata findOneByUnparsed(array $unparsed) Return the first ChildTorrentMetadata filtered by the unparsed column
  * @method     ChildTorrentMetadata findOneByResolution(string $resolution) Return the first ChildTorrentMetadata filtered by the resolution column
  * @method     ChildTorrentMetadata findOneByVideo(string $video) Return the first ChildTorrentMetadata filtered by the video column
- * @method     ChildTorrentMetadata findOneByVideo-depth(string $video-depth) Return the first ChildTorrentMetadata filtered by the video-depth column
+ * @method     ChildTorrentMetadata findOneByVideoDepth(string $video_depth) Return the first ChildTorrentMetadata filtered by the video_depth column
  * @method     ChildTorrentMetadata findOneByAudio(string $audio) Return the first ChildTorrentMetadata filtered by the audio column
  * @method     ChildTorrentMetadata findOneBySource(string $source) Return the first ChildTorrentMetadata filtered by the source column
  * @method     ChildTorrentMetadata findOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column
@@ -103,7 +100,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata requirePk($key, ConnectionInterface $con = null) Return the ChildTorrentMetadata by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOne(ConnectionInterface $con = null) Return the first ChildTorrentMetadata matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTorrentMetadata requireOneById(string $id) Return the first ChildTorrentMetadata filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByTorrentId(string $torrent_id) Return the first ChildTorrentMetadata filtered by the torrent_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByName(string $name) Return the first ChildTorrentMetadata filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByType(string $type) Return the first ChildTorrentMetadata filtered by the type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -111,7 +107,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata requireOneByUnparsed(array $unparsed) Return the first ChildTorrentMetadata filtered by the unparsed column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByResolution(string $resolution) Return the first ChildTorrentMetadata filtered by the resolution column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByVideo(string $video) Return the first ChildTorrentMetadata filtered by the video column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTorrentMetadata requireOneByVideo-depth(string $video-depth) Return the first ChildTorrentMetadata filtered by the video-depth column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentMetadata requireOneByVideoDepth(string $video_depth) Return the first ChildTorrentMetadata filtered by the video_depth column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByAudio(string $audio) Return the first ChildTorrentMetadata filtered by the audio column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneBySource(string $source) Return the first ChildTorrentMetadata filtered by the source column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -123,7 +119,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata requireOneByLastUpdated(string $last_updated) Return the first ChildTorrentMetadata filtered by the last_updated column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTorrentMetadata[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTorrentMetadata objects based on current ModelCriteria
- * @method     ChildTorrentMetadata[]|ObjectCollection findById(string $id) Return ChildTorrentMetadata objects filtered by the id column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByTorrentId(string $torrent_id) Return ChildTorrentMetadata objects filtered by the torrent_id column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByName(string $name) Return ChildTorrentMetadata objects filtered by the name column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByType(string $type) Return ChildTorrentMetadata objects filtered by the type column
@@ -131,7 +126,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata[]|ObjectCollection findByUnparsed(array $unparsed) Return ChildTorrentMetadata objects filtered by the unparsed column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByResolution(string $resolution) Return ChildTorrentMetadata objects filtered by the resolution column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByVideo(string $video) Return ChildTorrentMetadata objects filtered by the video column
- * @method     ChildTorrentMetadata[]|ObjectCollection findByVideo-depth(string $video-depth) Return ChildTorrentMetadata objects filtered by the video-depth column
+ * @method     ChildTorrentMetadata[]|ObjectCollection findByVideoDepth(string $video_depth) Return ChildTorrentMetadata objects filtered by the video_depth column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByAudio(string $audio) Return ChildTorrentMetadata objects filtered by the audio column
  * @method     ChildTorrentMetadata[]|ObjectCollection findBySource(string $source) Return ChildTorrentMetadata objects filtered by the source column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByContainer(string $container) Return ChildTorrentMetadata objects filtered by the container column
@@ -239,7 +234,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, torrent_id, name, type, group, unparsed, resolution, video, video-depth, audio, source, container, crc32, ep, volume, collection, date_created, last_updated FROM torrent_metadata WHERE id = :p0';
+        $sql = 'SELECT `torrent_id`, `name`, `type`, `group`, `unparsed`, `resolution`, `video`, `video_depth`, `audio`, `source`, `container`, `crc32`, `ep`, `volume`, `collection`, `date_created`, `last_updated` FROM `torrent_metadata` WHERE `torrent_id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -313,7 +308,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(TorrentMetadataTableMap::COL_TORRENT_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -326,48 +321,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(TorrentMetadataTableMap::COL_TORRENT_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -589,28 +543,28 @@ abstract class TorrentMetadataQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the video-depth column
+     * Filter the query on the video_depth column
      *
      * Example usage:
      * <code>
-     * $query->filterByVideo-depth('fooValue');   // WHERE video-depth = 'fooValue'
-     * $query->filterByVideo-depth('%fooValue%', Criteria::LIKE); // WHERE video-depth LIKE '%fooValue%'
+     * $query->filterByVideoDepth('fooValue');   // WHERE video_depth = 'fooValue'
+     * $query->filterByVideoDepth('%fooValue%', Criteria::LIKE); // WHERE video_depth LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $video-depth The value to use as filter.
+     * @param     string $videoDepth The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
      */
-    public function filterByVideo-depth($video-depth = null, $comparison = null)
+    public function filterByVideoDepth($videoDepth = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($video-depth)) {
+            if (is_array($videoDepth)) {
                 $comparison = Criteria::IN;
             }
         }
 
-        return $this->addUsingAlias(TorrentMetadataTableMap::COL_VIDEO-DEPTH, $video-depth, $comparison);
+        return $this->addUsingAlias(TorrentMetadataTableMap::COL_VIDEO_DEPTH, $videoDepth, $comparison);
     }
 
     /**
@@ -986,7 +940,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
     public function prune($torrentMetadata = null)
     {
         if ($torrentMetadata) {
-            $this->addUsingAlias(TorrentMetadataTableMap::COL_ID, $torrentMetadata->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(TorrentMetadataTableMap::COL_TORRENT_ID, $torrentMetadata->getTorrentId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

@@ -59,7 +59,7 @@ class TorrentStatusTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,7 @@ class TorrentStatusTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'torrent_status.id';
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the torrent_id field
@@ -118,11 +113,11 @@ class TorrentStatusTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TorrentId', 'Seeders', 'Leechers', 'Downloaded', 'LastUpdated', 'CreatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'torrentId', 'seeders', 'leechers', 'downloaded', 'lastUpdated', 'createdAt', ),
-        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_ID, TorrentStatusTableMap::COL_TORRENT_ID, TorrentStatusTableMap::COL_SEEDERS, TorrentStatusTableMap::COL_LEECHERS, TorrentStatusTableMap::COL_DOWNLOADED, TorrentStatusTableMap::COL_LAST_UPDATED, TorrentStatusTableMap::COL_CREATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'torrent_id', 'seeders', 'leechers', 'downloaded', 'last_updated', 'created_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('TorrentId', 'Seeders', 'Leechers', 'Downloaded', 'LastUpdated', 'CreatedAt', ),
+        self::TYPE_CAMELNAME     => array('torrentId', 'seeders', 'leechers', 'downloaded', 'lastUpdated', 'createdAt', ),
+        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID, TorrentStatusTableMap::COL_SEEDERS, TorrentStatusTableMap::COL_LEECHERS, TorrentStatusTableMap::COL_DOWNLOADED, TorrentStatusTableMap::COL_LAST_UPDATED, TorrentStatusTableMap::COL_CREATED_AT, ),
+        self::TYPE_FIELDNAME     => array('torrent_id', 'seeders', 'leechers', 'downloaded', 'last_updated', 'created_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -132,11 +127,11 @@ class TorrentStatusTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TorrentId' => 1, 'Seeders' => 2, 'Leechers' => 3, 'Downloaded' => 4, 'LastUpdated' => 5, 'CreatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'torrentId' => 1, 'seeders' => 2, 'leechers' => 3, 'downloaded' => 4, 'lastUpdated' => 5, 'createdAt' => 6, ),
-        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_ID => 0, TorrentStatusTableMap::COL_TORRENT_ID => 1, TorrentStatusTableMap::COL_SEEDERS => 2, TorrentStatusTableMap::COL_LEECHERS => 3, TorrentStatusTableMap::COL_DOWNLOADED => 4, TorrentStatusTableMap::COL_LAST_UPDATED => 5, TorrentStatusTableMap::COL_CREATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'torrent_id' => 1, 'seeders' => 2, 'leechers' => 3, 'downloaded' => 4, 'last_updated' => 5, 'created_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('TorrentId' => 0, 'Seeders' => 1, 'Leechers' => 2, 'Downloaded' => 3, 'LastUpdated' => 4, 'CreatedAt' => 5, ),
+        self::TYPE_CAMELNAME     => array('torrentId' => 0, 'seeders' => 1, 'leechers' => 2, 'downloaded' => 3, 'lastUpdated' => 4, 'createdAt' => 5, ),
+        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID => 0, TorrentStatusTableMap::COL_SEEDERS => 1, TorrentStatusTableMap::COL_LEECHERS => 2, TorrentStatusTableMap::COL_DOWNLOADED => 3, TorrentStatusTableMap::COL_LAST_UPDATED => 4, TorrentStatusTableMap::COL_CREATED_AT => 5, ),
+        self::TYPE_FIELDNAME     => array('torrent_id' => 0, 'seeders' => 1, 'leechers' => 2, 'downloaded' => 3, 'last_updated' => 4, 'created_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -151,13 +146,12 @@ class TorrentStatusTableMap extends TableMap
         // attributes
         $this->setName('torrent_status');
         $this->setPhpName('TorrentStatus');
-        $this->setIdentifierQuoting(false);
+        $this->setIdentifierQuoting(true);
         $this->setClassName('\\Odango\\Hebi\\Model\\TorrentStatus');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'BIGINT', true, null, null);
-        $this->addForeignKey('torrent_id', 'TorrentId', 'BIGINT', 'torrent', 'id', true, null, null);
+        $this->addForeignPrimaryKey('torrent_id', 'TorrentId', 'BIGINT' , 'torrent', 'id', true, null, null);
         $this->addColumn('seeders', 'Seeders', 'BIGINT', false, null, null);
         $this->addColumn('leechers', 'Leechers', 'BIGINT', false, null, null);
         $this->addColumn('downloaded', 'Downloaded', 'BIGINT', false, null, null);
@@ -208,11 +202,11 @@ class TorrentStatusTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -232,7 +226,7 @@ class TorrentStatusTableMap extends TableMap
         return (string) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('TorrentId', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
 
@@ -333,7 +327,6 @@ class TorrentStatusTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TorrentStatusTableMap::COL_ID);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_TORRENT_ID);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_SEEDERS);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_LEECHERS);
@@ -341,7 +334,6 @@ class TorrentStatusTableMap extends TableMap
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_LAST_UPDATED);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_CREATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.torrent_id');
             $criteria->addSelectColumn($alias . '.seeders');
             $criteria->addSelectColumn($alias . '.leechers');
@@ -399,7 +391,7 @@ class TorrentStatusTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(TorrentStatusTableMap::DATABASE_NAME);
-            $criteria->add(TorrentStatusTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(TorrentStatusTableMap::COL_TORRENT_ID, (array) $values, Criteria::IN);
         }
 
         $query = TorrentStatusQuery::create()->mergeWith($criteria);
@@ -445,10 +437,6 @@ class TorrentStatusTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from TorrentStatus object
-        }
-
-        if ($criteria->containsKey(TorrentStatusTableMap::COL_ID) && $criteria->keyContainsValue(TorrentStatusTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TorrentStatusTableMap::COL_ID.')');
         }
 
 
