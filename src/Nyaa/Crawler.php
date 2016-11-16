@@ -35,6 +35,11 @@ class Crawler extends Scheduler
     private $fetcher;
 
     /**
+     * @var bool
+     */
+    private $isStopping = false;
+
+    /**
      * @return Logger
      */
     public function getLogger() {
@@ -57,6 +62,8 @@ class Crawler extends Scheduler
 
         $this->getLogger()->info('Using proxy: ' . ($this->container['config']['nyaa']['proxy'] ?? "no"));
 
+        $this->hookSignal();
+
         Propel::disableInstancePooling();
         $this->getLogger()->info("Starting nyaa scheduler");
         $this->updateCrawlItems()->then(function () use ($callback) {
@@ -68,6 +75,23 @@ class Crawler extends Scheduler
             $this->getLogger()->warning('Starting failed: ' . $err->getMessage());
             var_dump($err);
         });
+    }
+
+    public function hookSignal() {
+        pcntl_signal(SIGINT, function () {
+            $this->stop();
+        });
+    }
+
+    public function stop() {
+        $this->getLogger()->info('Requested to stop. finishing.');
+        $this->isStopping = true;
+        $batch = $this->batch;
+        $this->batch = [];
+
+        CrawlItemQuery::create()
+            ->filterById($batch)
+            ->update(['Status' => 'created']);
     }
 
     public function updateCrawlItems() {
@@ -200,6 +224,10 @@ class Crawler extends Scheduler
 
     public function onDepletion(callable $callback)
     {
+        if ($this->isStopping) {
+            $callback();
+            return;
+        }
         $this->getLogger()->info("Batch depleted, queueing more items");
         $this->obtainBatch();
         $callback();
@@ -256,6 +284,7 @@ class Crawler extends Scheduler
 
     public function tick()
     {
+        pcntl_signal_dispatch();
         $this->fetcher->tick();
     }
 }
