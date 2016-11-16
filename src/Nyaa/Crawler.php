@@ -238,7 +238,7 @@ class Crawler extends Scheduler
         /** @var Filesystem $filesystem */
         $filesystem = $this->container['filesystem'];
         $path = 'torrents/' . substr($id, 0, 2) . '/' . $id . '.torrent';
-        $success = $filesystem->write($path, $torrent);
+        $success = $filesystem->put($path, $torrent);
         if ($success === false) {
             throw new \Exception("Failed writing Torrent[ext_id={$id},target=nyaa] to {$path}");
         }
