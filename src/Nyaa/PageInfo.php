@@ -11,6 +11,23 @@ class PageInfo
     private $submitterId;
     private $categoryId;
     private $torrentId;
+    private $source;
+
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
 
     /**
      * @return mixed

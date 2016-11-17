@@ -39,6 +39,8 @@ class Crawler extends Scheduler
      */
     private $isStopping = false;
 
+    protected $simultaneous = 10;
+
     /**
      * @return Logger
      */
@@ -58,6 +60,7 @@ class Crawler extends Scheduler
         $this->container['main']->initGuzzle([
             'proxy' => $this->container['config']['nyaa']['proxy'] ?? null,
             'verify' => $this->container['config']['nyaa']['verify_ssl'] ?? true,
+            'timeout' => 30,
         ]);
 
         $this->getLogger()->info('Using proxy: ' . ($this->container['config']['nyaa']['proxy'] ?? "no"));
@@ -73,7 +76,6 @@ class Crawler extends Scheduler
         })->otherwise(function (\Exception $err) {
             $this->beforeDone = true;
             $this->getLogger()->warning('Starting failed: ' . $err->getMessage());
-            var_dump($err);
         });
     }
 
@@ -184,7 +186,8 @@ class Crawler extends Scheduler
         )->then(function () use ($callback) {
             $callback();
         })->otherwise(function (\Exception $e) use ($crawlItem, $callback) {
-            $this->getLogger()->warn("Process for CrawlItem[id={$crawlItem->getId()}] failed: {$e->getMessage()}");
+            $this->getLogger()->warn("Process for CrawlItem[id={$crawlItem->getId()},target=nyaa,ext_id={$crawlItem->getExternalId()}] failed: {$e->getMessage()}");
+            $this->container['filesystem']->put('errors/crawl-items/' . $crawlItem->getId(), print_r([ 'line' => $e->getLine(), 'file' => $e->getFile(), 'message' => $e->getMessage() ], true));
             $crawlItem->fail();
             $callback();
         });
@@ -211,7 +214,7 @@ class Crawler extends Scheduler
                 $crawlItem->save();
                 $this->getLogger()->debug("CrawlItem[id={$crawlItem->getId()}] fully done");
 
-                return;
+                return null;
             });
         } else {
             $this->getLogger()->debug("Torrent[target=nyaa,ext_id={$crawlItem->getExternalId()}] doesn't exist");
@@ -243,6 +246,7 @@ class Crawler extends Scheduler
             $torrentObj = $crawlItem->getTorrent();
 
             $path = $this->storeTorrent($crawlItem->getExternalId(), $torrent);
+
             $torrentReader = TorrentReader::createFromTorrent($torrent);
 
             if ($torrentObj === null) {

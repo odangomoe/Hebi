@@ -86,6 +86,13 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     protected $type;
 
     /**
+     * The value for the version field.
+     *
+     * @var        string
+     */
+    protected $version;
+
+    /**
      * The value for the group field.
      *
      * @var        string
@@ -466,6 +473,16 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     }
 
     /**
+     * Get the [version] column value.
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
      * Get the [group] column value.
      *
      * @return string
@@ -704,6 +721,26 @@ abstract class TorrentMetadata implements ActiveRecordInterface
 
         return $this;
     } // setType()
+
+    /**
+     * Set the value of [version] column.
+     *
+     * @param string $v new value
+     * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[TorrentMetadataTableMap::COL_VERSION] = true;
+        }
+
+        return $this;
+    } // setVersion()
 
     /**
      * Set the value of [group] column.
@@ -1024,51 +1061,54 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TorrentMetadataTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TorrentMetadataTableMap::translateFieldName('Group', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TorrentMetadataTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TorrentMetadataTableMap::translateFieldName('Group', TableMap::TYPE_PHPNAME, $indexType)];
             $this->group = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TorrentMetadataTableMap::translateFieldName('Unparsed', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TorrentMetadataTableMap::translateFieldName('Unparsed', TableMap::TYPE_PHPNAME, $indexType)];
             $this->unparsed = $col;
             $this->unparsed_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TorrentMetadataTableMap::translateFieldName('Resolution', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentMetadataTableMap::translateFieldName('Resolution', TableMap::TYPE_PHPNAME, $indexType)];
             $this->resolution = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentMetadataTableMap::translateFieldName('Video', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentMetadataTableMap::translateFieldName('Video', TableMap::TYPE_PHPNAME, $indexType)];
             $this->video = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentMetadataTableMap::translateFieldName('VideoDepth', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : TorrentMetadataTableMap::translateFieldName('VideoDepth', TableMap::TYPE_PHPNAME, $indexType)];
             $this->video_depth = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : TorrentMetadataTableMap::translateFieldName('Audio', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : TorrentMetadataTableMap::translateFieldName('Audio', TableMap::TYPE_PHPNAME, $indexType)];
             $this->audio = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : TorrentMetadataTableMap::translateFieldName('Source', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : TorrentMetadataTableMap::translateFieldName('Source', TableMap::TYPE_PHPNAME, $indexType)];
             $this->source = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : TorrentMetadataTableMap::translateFieldName('Container', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : TorrentMetadataTableMap::translateFieldName('Container', TableMap::TYPE_PHPNAME, $indexType)];
             $this->container = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : TorrentMetadataTableMap::translateFieldName('Crc32', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : TorrentMetadataTableMap::translateFieldName('Crc32', TableMap::TYPE_PHPNAME, $indexType)];
             $this->crc32 = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : TorrentMetadataTableMap::translateFieldName('Ep', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : TorrentMetadataTableMap::translateFieldName('Ep', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ep = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : TorrentMetadataTableMap::translateFieldName('Volume', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : TorrentMetadataTableMap::translateFieldName('Volume', TableMap::TYPE_PHPNAME, $indexType)];
             $this->volume = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : TorrentMetadataTableMap::translateFieldName('Collection', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : TorrentMetadataTableMap::translateFieldName('Collection', TableMap::TYPE_PHPNAME, $indexType)];
             $this->collection = $col;
             $this->collection_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : TorrentMetadataTableMap::translateFieldName('DateCreated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : TorrentMetadataTableMap::translateFieldName('DateCreated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->date_created = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : TorrentMetadataTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : TorrentMetadataTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1081,7 +1121,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 17; // 17 = TorrentMetadataTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 18; // 18 = TorrentMetadataTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\TorrentMetadata'), 0, $e);
@@ -1311,6 +1351,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_TYPE)) {
             $modifiedColumns[':p' . $index++]  = '`type`';
         }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`version`';
+        }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_GROUP)) {
             $modifiedColumns[':p' . $index++]  = '`group`';
         }
@@ -1372,6 +1415,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                         break;
                     case '`type`':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case '`version`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_STR);
                         break;
                     case '`group`':
                         $stmt->bindValue($identifier, $this->group, PDO::PARAM_STR);
@@ -1480,45 +1526,48 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 return $this->getType();
                 break;
             case 3:
-                return $this->getGroup();
+                return $this->getVersion();
                 break;
             case 4:
-                return $this->getUnparsed();
+                return $this->getGroup();
                 break;
             case 5:
-                return $this->getResolution();
+                return $this->getUnparsed();
                 break;
             case 6:
-                return $this->getVideo();
+                return $this->getResolution();
                 break;
             case 7:
-                return $this->getVideoDepth();
+                return $this->getVideo();
                 break;
             case 8:
-                return $this->getAudio();
+                return $this->getVideoDepth();
                 break;
             case 9:
-                return $this->getSource();
+                return $this->getAudio();
                 break;
             case 10:
-                return $this->getContainer();
+                return $this->getSource();
                 break;
             case 11:
-                return $this->getCrc32();
+                return $this->getContainer();
                 break;
             case 12:
-                return $this->getEp();
+                return $this->getCrc32();
                 break;
             case 13:
-                return $this->getVolume();
+                return $this->getEp();
                 break;
             case 14:
-                return $this->getCollection();
+                return $this->getVolume();
                 break;
             case 15:
-                return $this->getDateCreated();
+                return $this->getCollection();
                 break;
             case 16:
+                return $this->getDateCreated();
+                break;
+            case 17:
                 return $this->getLastUpdated();
                 break;
             default:
@@ -1554,27 +1603,28 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $keys[0] => $this->getTorrentId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getType(),
-            $keys[3] => $this->getGroup(),
-            $keys[4] => $this->getUnparsed(),
-            $keys[5] => $this->getResolution(),
-            $keys[6] => $this->getVideo(),
-            $keys[7] => $this->getVideoDepth(),
-            $keys[8] => $this->getAudio(),
-            $keys[9] => $this->getSource(),
-            $keys[10] => $this->getContainer(),
-            $keys[11] => $this->getCrc32(),
-            $keys[12] => $this->getEp(),
-            $keys[13] => $this->getVolume(),
-            $keys[14] => $this->getCollection(),
-            $keys[15] => $this->getDateCreated(),
-            $keys[16] => $this->getLastUpdated(),
+            $keys[3] => $this->getVersion(),
+            $keys[4] => $this->getGroup(),
+            $keys[5] => $this->getUnparsed(),
+            $keys[6] => $this->getResolution(),
+            $keys[7] => $this->getVideo(),
+            $keys[8] => $this->getVideoDepth(),
+            $keys[9] => $this->getAudio(),
+            $keys[10] => $this->getSource(),
+            $keys[11] => $this->getContainer(),
+            $keys[12] => $this->getCrc32(),
+            $keys[13] => $this->getEp(),
+            $keys[14] => $this->getVolume(),
+            $keys[15] => $this->getCollection(),
+            $keys[16] => $this->getDateCreated(),
+            $keys[17] => $this->getLastUpdated(),
         );
-        if ($result[$keys[15]] instanceof \DateTime) {
-            $result[$keys[15]] = $result[$keys[15]]->format('c');
-        }
-
         if ($result[$keys[16]] instanceof \DateTime) {
             $result[$keys[16]] = $result[$keys[16]]->format('c');
+        }
+
+        if ($result[$keys[17]] instanceof \DateTime) {
+            $result[$keys[17]] = $result[$keys[17]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1642,53 +1692,56 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 $this->setType($value);
                 break;
             case 3:
-                $this->setGroup($value);
+                $this->setVersion($value);
                 break;
             case 4:
+                $this->setGroup($value);
+                break;
+            case 5:
                 if (!is_array($value)) {
                     $v = trim(substr($value, 2, -2));
                     $value = $v ? explode(' | ', $v) : array();
                 }
                 $this->setUnparsed($value);
                 break;
-            case 5:
+            case 6:
                 $this->setResolution($value);
                 break;
-            case 6:
+            case 7:
                 $this->setVideo($value);
                 break;
-            case 7:
+            case 8:
                 $this->setVideoDepth($value);
                 break;
-            case 8:
+            case 9:
                 $this->setAudio($value);
                 break;
-            case 9:
+            case 10:
                 $this->setSource($value);
                 break;
-            case 10:
+            case 11:
                 $this->setContainer($value);
                 break;
-            case 11:
+            case 12:
                 $this->setCrc32($value);
                 break;
-            case 12:
+            case 13:
                 $this->setEp($value);
                 break;
-            case 13:
+            case 14:
                 $this->setVolume($value);
                 break;
-            case 14:
+            case 15:
                 if (!is_array($value)) {
                     $v = trim(substr($value, 2, -2));
                     $value = $v ? explode(' | ', $v) : array();
                 }
                 $this->setCollection($value);
                 break;
-            case 15:
+            case 16:
                 $this->setDateCreated($value);
                 break;
-            case 16:
+            case 17:
                 $this->setLastUpdated($value);
                 break;
         } // switch()
@@ -1727,46 +1780,49 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $this->setType($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setGroup($arr[$keys[3]]);
+            $this->setVersion($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setUnparsed($arr[$keys[4]]);
+            $this->setGroup($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setResolution($arr[$keys[5]]);
+            $this->setUnparsed($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setVideo($arr[$keys[6]]);
+            $this->setResolution($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setVideoDepth($arr[$keys[7]]);
+            $this->setVideo($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setAudio($arr[$keys[8]]);
+            $this->setVideoDepth($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setSource($arr[$keys[9]]);
+            $this->setAudio($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setContainer($arr[$keys[10]]);
+            $this->setSource($arr[$keys[10]]);
         }
         if (array_key_exists($keys[11], $arr)) {
-            $this->setCrc32($arr[$keys[11]]);
+            $this->setContainer($arr[$keys[11]]);
         }
         if (array_key_exists($keys[12], $arr)) {
-            $this->setEp($arr[$keys[12]]);
+            $this->setCrc32($arr[$keys[12]]);
         }
         if (array_key_exists($keys[13], $arr)) {
-            $this->setVolume($arr[$keys[13]]);
+            $this->setEp($arr[$keys[13]]);
         }
         if (array_key_exists($keys[14], $arr)) {
-            $this->setCollection($arr[$keys[14]]);
+            $this->setVolume($arr[$keys[14]]);
         }
         if (array_key_exists($keys[15], $arr)) {
-            $this->setDateCreated($arr[$keys[15]]);
+            $this->setCollection($arr[$keys[15]]);
         }
         if (array_key_exists($keys[16], $arr)) {
-            $this->setLastUpdated($arr[$keys[16]]);
+            $this->setDateCreated($arr[$keys[16]]);
+        }
+        if (array_key_exists($keys[17], $arr)) {
+            $this->setLastUpdated($arr[$keys[17]]);
         }
     }
 
@@ -1817,6 +1873,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_TYPE)) {
             $criteria->add(TorrentMetadataTableMap::COL_TYPE, $this->type);
+        }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_VERSION)) {
+            $criteria->add(TorrentMetadataTableMap::COL_VERSION, $this->version);
         }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_GROUP)) {
             $criteria->add(TorrentMetadataTableMap::COL_GROUP, $this->group);
@@ -1956,6 +2015,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         $copyObj->setTorrentId($this->getTorrentId());
         $copyObj->setName($this->getName());
         $copyObj->setType($this->getType());
+        $copyObj->setVersion($this->getVersion());
         $copyObj->setGroup($this->getGroup());
         $copyObj->setUnparsed($this->getUnparsed());
         $copyObj->setResolution($this->getResolution());
@@ -2055,6 +2115,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         $this->torrent_id = null;
         $this->name = null;
         $this->type = null;
+        $this->version = null;
         $this->group = null;
         $this->unparsed = null;
         $this->unparsed_unserialized = null;

@@ -68,6 +68,7 @@
 
         <column name="name" type="LONGVARCHAR" size="255" />
         <column name="type" type="varchar" size="255" />
+        <column name="version" type="varchar" size="255" />
         <column name="group" type="varchar" size="255" />
         <column name="unparsed" type="array" />
         <column name="resolution" type="varchar" size="255" />

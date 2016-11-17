@@ -13,6 +13,7 @@ class PageReader extends Reader
 {
     public function extractInfo(): PageInfo {
         $pageInfo = new PageInfo();
+        $pageInfo->setSource($this->getSource());
 
         if (!$this->parseIsFound()) {
             $pageInfo->setIsFound(false);
