@@ -33,7 +33,7 @@ abstract class Scheduler
             });
         }
 
-        if (!$final && !$this->hasItems() && $this->running == 0) {
+        if (!$final && !$this->hasItems()) {
             $this->onDepletion(function () {
                 $this->push(true);
             });

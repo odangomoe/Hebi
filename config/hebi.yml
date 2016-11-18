@@ -5,5 +5,5 @@ hebi:
       - 1_37
     proxy: 'http://proxy'
     verify_ssl: false
-    batch: 100
+    batch: 10000
     site: 'https://nyaa.se'

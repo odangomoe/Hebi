@@ -162,7 +162,7 @@ class Crawler extends Scheduler
 
         $con->commit();
 
-        $this->batch = $ids;
+        $this->batch = array_merge($this->batch, $ids);
     }
 
     public function getNextItem()

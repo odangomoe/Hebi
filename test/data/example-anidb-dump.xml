@@ -1,0 +1,44 @@
+<animetitles>
+    <anime aid="1">
+        <title type="short" xml:lang="en">CotS</title>
+        <title type="official" xml:lang="fr">Crest of the Stars</title>
+        <title type="official" xml:lang="en">Crest of the Stars</title>
+        <title xml:lang="pl" type="official">Crest of the Stars</title>
+        <title xml:lang="cs" type="syn">Hvězdný erb</title>
+        <title xml:lang="x-jat" type="main">Seikai no Monshou</title>
+        <title type="short" xml:lang="x-jat">SnM</title>
+        <title xml:lang="zh-Hans" type="syn">星界之纹章</title>
+        <title xml:lang="ja" type="official">星界の紋章</title>
+    </anime>
+    <anime aid="2">
+        <title xml:lang="ja" type="syn">サザンアイズ</title>
+        <title type="official" xml:lang="ja">3×3 EYES</title>
+        <title xml:lang="x-jat" type="short">3x3</title>
+        <title type="official" xml:lang="de">3x3 Augen (OVA 1)</title>
+        <title xml:lang="x-jat" type="main">3x3 Eyes</title>
+        <title xml:lang="en" type="official">3x3 Eyes</title>
+        <title type="official" xml:lang="fr">3x3 Eyes</title>
+        <title type="syn" xml:lang="en">3x3 Eyes - Immortals</title>
+        <title xml:lang="it" type="official">3x3 Occhi</title>
+        <title xml:lang="cs" type="official">3x3 Oči</title>
+        <title type="official" xml:lang="sv">3x3 Ögon</title>
+        <title type="official" xml:lang="es">3x3 Ojos [1-4]</title>
+        <title type="official" xml:lang="ca">3x3 Ulls</title>
+        <title type="syn" xml:lang="ru">3x3 глаза</title>
+        <title type="syn" xml:lang="x-jat">Sazan Eyes</title>
+        <title type="syn" xml:lang="zh-x-nan">三隻眼</title>
+    </anime>
+    <anime aid="3">
+        <title xml:lang="ja" type="official">3×3 EYES -聖魔伝説-</title>
+        <title xml:lang="pl" type="official">3*3 Oczy</title>
+        <title xml:lang="de" type="official">3x3 Augen (OVA 2)</title>
+        <title xml:lang="fr" type="official">3x3 Eyes - La légende du démon divin</title>
+        <title type="official" xml:lang="en">3x3 Eyes: Legend of the Divine Demon</title>
+        <title type="main" xml:lang="x-jat">3x3 Eyes: Seima Densetsu</title>
+        <title type="official" xml:lang="it">3x3 Occhi - La Leggenda del Demone Divino</title>
+        <title xml:lang="sv" type="syn">3x3 Ögon (1995)</title>
+        <title type="official" xml:lang="es">3x3 Ojos [5-7]</title>
+        <title xml:lang="ru" type="syn">3х3 глаза: Сказание Сэймы</title>
+        <title xml:lang="x-jat" type="syn">Shin 3x3 Eyes</title>
+    </anime>
+</animetitles>
