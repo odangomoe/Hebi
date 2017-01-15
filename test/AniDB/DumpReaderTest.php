@@ -15,7 +15,5 @@ class DumpReaderTest extends \PHPUnit_Framework_TestCase
         $dr = DumpReader::createFromSource($xml);
 
         $this->assertCount(3, $dr);
-
-        $first =
     }
 }

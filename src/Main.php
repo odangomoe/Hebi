@@ -9,7 +9,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Odango\Hebi\Nyaa\Crawler;
+use Odango\Hebi\Nyaa\Iterator;
 use Pimple\Container;
 use Propel\Runtime\Propel;
 use Symfony\Component\Yaml\Yaml;
@@ -73,7 +73,7 @@ class Main
 
         switch ($action) {
             case 'nyaa':
-                $crawler = new Crawler($this->container);
+                $crawler = new Iterator($this->container);
                 $crawler->start();
                 break;
             default:

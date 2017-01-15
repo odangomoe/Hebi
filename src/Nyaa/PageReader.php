@@ -31,7 +31,13 @@ class PageReader extends Reader
     }
 
     public function parseTitle(): string {
-        return $this->getDocument()->find('.viewtorrentname')->first()->getText();
+        $title = $this->getDocument()->find('.viewtorrentname')->first();
+
+        if ($title !== null) {
+            return $title->getText();
+        }
+
+        return "";
     }
 
     private function getSubmitterTableField(): Element {
@@ -46,6 +52,10 @@ class PageReader extends Reader
     {
         /** @var Element $a */
         $a = $this->getSubmitterTableField()->find('a')->first();
+
+        if ($a === null) {
+            return -1;
+        }
 
         $href = $a->attr('href');
 
@@ -64,6 +74,6 @@ class PageReader extends Reader
     }
 
     public function parseIsFound() {
-        return strpos($this->getSource(), "The torrent you are looking for does not appear to be in the database.") === false;
+        return $this->getDocument()->find('img[alt="Download"]')->count() > 0;
     }
 }

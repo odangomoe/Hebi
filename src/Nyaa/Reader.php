@@ -55,7 +55,7 @@ abstract class Reader
         $this->source = $source;
     }
 
-    static public function createFromSource($source) {
+    static public function createFromSource($source): Reader {
         $reader = new static();
         $reader->setSource($source);
         return $reader;
