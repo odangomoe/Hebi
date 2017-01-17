@@ -3,64 +3,53 @@
 
 namespace Odango\Hebi\AniDB;
 
+use Odango\Hebi\Reader;
 
-class DumpReader
+/**
+ * Class DumpReader
+ * @package Odango\Hebi\AniDB
+ */
+class DumpReader extends Reader
 {
-    /**
-     * @var \DOMDocument
-     */
-    private $document;
-
-    /**
-     * @var string
-     */
-    private $source;
-
-    /**
-     * @return \DOMDocument
-     */
-    public function getDocument(): \DOMDocument
-    {
-        return $this->document;
-    }
-
-    /**
-     * @param \DOMDocument $document
-     */
-    public function setDocument(\DOMDocument $document)
-    {
-        $this->document = $document;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSource(): string
-    {
-        return $this->source;
-    }
-
-    /**
-     * @param string $source
-     */
-    public function setSource(string $source)
-    {
-        $doc = new \DOMDocument();
-        $doc->loadXML($source);
-
-        $this->document = $doc;
-        $this->source = $source;
-    }
-
     /**
      * @var \DOMNode
      */
     private $current;
 
-    static public function createFromSource(string $source) {
-        $dr = new static();
-        $dr->setSource($source);
+    /**
+     * @return \DOMNode
+     */
+    public function getNextItem() {
+        if ($this->current == null) {
+            $this->current = $this->getDocument()->find('animetitles')[0]->childNodes[0];
+        } else {
+            $this->current = $this->current->nextSibling;
+        }
 
-        return $dr;
+        return $this->current;
+    }
+
+    /**
+     * @return TitleCollection
+     */
+    public function getNextTitleCollection() {
+        $item = $this->getNextItem();
+        if ($item === null) {
+            return null;
+        }
+
+        return TitleCollection::createFromNode($item);
+    }
+
+    /**
+     * @return TitleCollection[]
+     */
+    public function getAllTitleCollections(): array {
+        $items = [];
+        while (($item =$this->getNextTitleCollection()) !== null) {
+            $items[] = $item;
+        }
+
+        return $items;
     }
 }

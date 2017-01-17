@@ -1,13 +1,15 @@
 <?php
 
 
-namespace Odango\Hebi\Nyaa;
+namespace Odango\Hebi;
 
 
 use DOMWrap\Document;
 
 abstract class Reader
 {
+
+
     /**
      * @var string
      */

@@ -6,9 +6,13 @@ namespace Odango\Hebi\Nyaa;
 
 use DOMWrap\Document;
 use DOMWrap\Element;
-use Odango\Hebi\Nyaa\Reader;
-use Symfony\Component\Validator\Tests\Fixtures\Countable;
+use Odango\Hebi\Reader;
 
+/**
+ * Class PageReader
+ * @package Odango\Hebi\Nyaa
+ * @method static
+ */
 class PageReader extends Reader
 {
     public function extractInfo(): PageInfo {
@@ -47,6 +51,12 @@ class PageReader extends Reader
         /** @var Element $a */
         $a = $this->getSubmitterTableField()->find('a')->first();
 
+        if ($a === null) {
+            // @codeCoverageIgnoreStart
+            return -1;
+            // @codeCoverageIgnoreEnd
+        }
+
         $href = $a->attr('href');
 
         return intval($this->getQueryItemFromUrl($href, 'user', -1));
@@ -64,6 +74,6 @@ class PageReader extends Reader
     }
 
     public function parseIsFound() {
-        return strpos($this->getSource(), "The torrent you are looking for does not appear to be in the database.") === false;
+        return $this->getDocument()->find('img[alt="Download"]')->count() > 0;
     }
 }

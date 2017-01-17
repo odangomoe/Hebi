@@ -46,16 +46,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildTorrentQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildTorrentQuery leftJoinCrawlItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CrawlItem relation
- * @method     ChildTorrentQuery rightJoinCrawlItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CrawlItem relation
- * @method     ChildTorrentQuery innerJoinCrawlItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CrawlItem relation
- *
- * @method     ChildTorrentQuery joinWithCrawlItem($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CrawlItem relation
- *
- * @method     ChildTorrentQuery leftJoinWithCrawlItem() Adds a LEFT JOIN clause and with to the query using the CrawlItem relation
- * @method     ChildTorrentQuery rightJoinWithCrawlItem() Adds a RIGHT JOIN clause and with to the query using the CrawlItem relation
- * @method     ChildTorrentQuery innerJoinWithCrawlItem() Adds a INNER JOIN clause and with to the query using the CrawlItem relation
- *
  * @method     ChildTorrentQuery leftJoinTorrentStatus($relationAlias = null) Adds a LEFT JOIN clause to the query using the TorrentStatus relation
  * @method     ChildTorrentQuery rightJoinTorrentStatus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TorrentStatus relation
  * @method     ChildTorrentQuery innerJoinTorrentStatus($relationAlias = null) Adds a INNER JOIN clause to the query using the TorrentStatus relation
@@ -76,7 +66,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery rightJoinWithTorrentMetadata() Adds a RIGHT JOIN clause and with to the query using the TorrentMetadata relation
  * @method     ChildTorrentQuery innerJoinWithTorrentMetadata() Adds a INNER JOIN clause and with to the query using the TorrentMetadata relation
  *
- * @method     \Odango\Hebi\Model\CrawlItemQuery|\Odango\Hebi\Model\TorrentStatusQuery|\Odango\Hebi\Model\TorrentMetadataQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \Odango\Hebi\Model\TorrentStatusQuery|\Odango\Hebi\Model\TorrentMetadataQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTorrent findOne(ConnectionInterface $con = null) Return the first ChildTorrent matching the query
  * @method     ChildTorrent findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTorrent matching the query, or a new ChildTorrent object populated from the query conditions when no match is found
@@ -308,8 +298,6 @@ abstract class TorrentQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByCrawlItem()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -623,83 +611,6 @@ abstract class TorrentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TorrentTableMap::COL_LAST_UPDATED, $lastUpdated, $comparison);
-    }
-
-    /**
-     * Filter the query by a related \Odango\Hebi\Model\CrawlItem object
-     *
-     * @param \Odango\Hebi\Model\CrawlItem|ObjectCollection $crawlItem The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildTorrentQuery The current query, for fluid interface
-     */
-    public function filterByCrawlItem($crawlItem, $comparison = null)
-    {
-        if ($crawlItem instanceof \Odango\Hebi\Model\CrawlItem) {
-            return $this
-                ->addUsingAlias(TorrentTableMap::COL_ID, $crawlItem->getId(), $comparison);
-        } elseif ($crawlItem instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(TorrentTableMap::COL_ID, $crawlItem->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByCrawlItem() only accepts arguments of type \Odango\Hebi\Model\CrawlItem or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CrawlItem relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildTorrentQuery The current query, for fluid interface
-     */
-    public function joinCrawlItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CrawlItem');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CrawlItem');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CrawlItem relation CrawlItem object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \Odango\Hebi\Model\CrawlItemQuery A secondary query class using the current class as primary query
-     */
-    public function useCrawlItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCrawlItem($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CrawlItem', '\Odango\Hebi\Model\CrawlItemQuery');
     }
 
     /**

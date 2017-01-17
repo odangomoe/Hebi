@@ -5,8 +5,6 @@ namespace Odango\Hebi\Model\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
-use Odango\Hebi\Model\CrawlItem as ChildCrawlItem;
-use Odango\Hebi\Model\CrawlItemQuery as ChildCrawlItemQuery;
 use Odango\Hebi\Model\Torrent as ChildTorrent;
 use Odango\Hebi\Model\TorrentMetadata as ChildTorrentMetadata;
 use Odango\Hebi\Model\TorrentMetadataQuery as ChildTorrentMetadataQuery;
@@ -130,11 +128,6 @@ abstract class Torrent implements ActiveRecordInterface
      * @var        DateTime
      */
     protected $last_updated;
-
-    /**
-     * @var        ChildCrawlItem
-     */
-    protected $aCrawlItem;
 
     /**
      * @var        ChildTorrentStatus one-to-one related ChildTorrentStatus object
@@ -441,7 +434,7 @@ abstract class Torrent implements ActiveRecordInterface
         }
         if (!$this->trackers_unserialized && null !== $this->trackers) {
             $trackers_unserialized = substr($this->trackers, 2, -2);
-            $this->trackers_unserialized = $trackers_unserialized ? explode(' | ', $trackers_unserialized) : array();
+            $this->trackers_unserialized = '' !== $trackers_unserialized ? explode(' | ', $trackers_unserialized) : array();
         }
 
         return $this->trackers_unserialized;
@@ -513,10 +506,6 @@ abstract class Torrent implements ActiveRecordInterface
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[TorrentTableMap::COL_ID] = true;
-        }
-
-        if ($this->aCrawlItem !== null && $this->aCrawlItem->getId() !== $v) {
-            $this->aCrawlItem = null;
         }
 
         return $this;
@@ -789,9 +778,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aCrawlItem !== null && $this->id !== $this->aCrawlItem->getId()) {
-            $this->aCrawlItem = null;
-        }
     } // ensureConsistency
 
     /**
@@ -831,7 +817,6 @@ abstract class Torrent implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCrawlItem = null;
             $this->singleTorrentStatus = null;
 
             $this->singleTorrentMetadata = null;
@@ -887,6 +872,10 @@ abstract class Torrent implements ActiveRecordInterface
     {
         if ($this->isDeleted()) {
             throw new PropelException("You cannot save an object that has been deleted.");
+        }
+
+        if ($this->alreadyInSave) {
+            return 0;
         }
 
         if ($con === null) {
@@ -946,18 +935,6 @@ abstract class Torrent implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
-
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their corresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aCrawlItem !== null) {
-                if ($this->aCrawlItem->isModified() || $this->aCrawlItem->isNew()) {
-                    $affectedRows += $this->aCrawlItem->save($con);
-                }
-                $this->setCrawlItem($this->aCrawlItem);
-            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -1195,21 +1172,6 @@ abstract class Torrent implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aCrawlItem) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'crawlItem';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'crawl_item';
-                        break;
-                    default:
-                        $key = 'CrawlItem';
-                }
-
-                $result[$key] = $this->aCrawlItem->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->singleTorrentStatus) {
 
                 switch ($keyType) {
@@ -1449,15 +1411,8 @@ abstract class Torrent implements ActiveRecordInterface
     {
         $validPk = null !== $this->getId();
 
-        $validPrimaryKeyFKs = 1;
+        $validPrimaryKeyFKs = 0;
         $primaryKeyFKs = [];
-
-        //relation torrent_fk_f1dcb5 to table crawl_item
-        if ($this->aCrawlItem && $hash = spl_object_hash($this->aCrawlItem)) {
-            $primaryKeyFKs[] = $hash;
-        } else {
-            $validPrimaryKeyFKs = false;
-        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1563,51 +1518,6 @@ abstract class Torrent implements ActiveRecordInterface
         return $copyObj;
     }
 
-    /**
-     * Declares an association between this object and a ChildCrawlItem object.
-     *
-     * @param  ChildCrawlItem $v
-     * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCrawlItem(ChildCrawlItem $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aCrawlItem = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setTorrent($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildCrawlItem object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCrawlItem The associated ChildCrawlItem object.
-     * @throws PropelException
-     */
-    public function getCrawlItem(ConnectionInterface $con = null)
-    {
-        if ($this->aCrawlItem === null && (($this->id !== "" && $this->id !== null))) {
-            $this->aCrawlItem = ChildCrawlItemQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCrawlItem->setTorrent($this);
-        }
-
-        return $this->aCrawlItem;
-    }
-
 
     /**
      * Initializes a collection based on the name of a relation.
@@ -1700,9 +1610,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aCrawlItem) {
-            $this->aCrawlItem->removeTorrent($this);
-        }
         $this->id = null;
         $this->info_hash = null;
         $this->cached_torrent_file = null;
@@ -1740,7 +1647,6 @@ abstract class Torrent implements ActiveRecordInterface
 
         $this->singleTorrentStatus = null;
         $this->singleTorrentMetadata = null;
-        $this->aCrawlItem = null;
     }
 
     /**

@@ -15,6 +15,7 @@ class PageInfo
 
     /**
      * @return mixed
+     * @codeCoverageIgnore
      */
     public function getSource()
     {

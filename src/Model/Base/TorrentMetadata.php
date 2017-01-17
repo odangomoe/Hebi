@@ -165,9 +165,16 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     /**
      * The value for the ep field.
      *
-     * @var        string
+     * @var        array
      */
     protected $ep;
+
+    /**
+     * The unserialized $ep value - i.e. the persisted object.
+     * This is necessary to avoid repeated calls to unserialize() at runtime.
+     * @var object
+     */
+    protected $ep_unserialized;
 
     /**
      * The value for the volume field.
@@ -504,7 +511,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if (!$this->unparsed_unserialized && null !== $this->unparsed) {
             $unparsed_unserialized = substr($this->unparsed, 2, -2);
-            $this->unparsed_unserialized = $unparsed_unserialized ? explode(' | ', $unparsed_unserialized) : array();
+            $this->unparsed_unserialized = '' !== $unparsed_unserialized ? explode(' | ', $unparsed_unserialized) : array();
         }
 
         return $this->unparsed_unserialized;
@@ -583,11 +590,19 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     /**
      * Get the [ep] column value.
      *
-     * @return string
+     * @return array
      */
     public function getEp()
     {
-        return $this->ep;
+        if (null === $this->ep_unserialized) {
+            $this->ep_unserialized = array();
+        }
+        if (!$this->ep_unserialized && null !== $this->ep) {
+            $ep_unserialized = substr($this->ep, 2, -2);
+            $this->ep_unserialized = '' !== $ep_unserialized ? explode(' | ', $ep_unserialized) : array();
+        }
+
+        return $this->ep_unserialized;
     }
 
     /**
@@ -612,7 +627,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if (!$this->collection_unserialized && null !== $this->collection) {
             $collection_unserialized = substr($this->collection, 2, -2);
-            $this->collection_unserialized = $collection_unserialized ? explode(' | ', $collection_unserialized) : array();
+            $this->collection_unserialized = '' !== $collection_unserialized ? explode(' | ', $collection_unserialized) : array();
         }
 
         return $this->collection_unserialized;
@@ -922,17 +937,14 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     /**
      * Set the value of [ep] column.
      *
-     * @param string $v new value
+     * @param array $v new value
      * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
      */
     public function setEp($v)
     {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->ep !== $v) {
-            $this->ep = $v;
+        if ($this->ep_unserialized !== $v) {
+            $this->ep_unserialized = $v;
+            $this->ep = '| ' . implode(' | ', $v) . ' |';
             $this->modifiedColumns[TorrentMetadataTableMap::COL_EP] = true;
         }
 
@@ -1093,7 +1105,8 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $this->crc32 = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : TorrentMetadataTableMap::translateFieldName('Ep', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ep = (null !== $col) ? (string) $col : null;
+            $this->ep = $col;
+            $this->ep_unserialized = null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : TorrentMetadataTableMap::translateFieldName('Volume', TableMap::TYPE_PHPNAME, $indexType)];
             $this->volume = (null !== $col) ? (string) $col : null;
@@ -1237,6 +1250,10 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     {
         if ($this->isDeleted()) {
             throw new PropelException("You cannot save an object that has been deleted.");
+        }
+
+        if ($this->alreadyInSave) {
+            return 0;
         }
 
         if ($con === null) {
@@ -1726,6 +1743,10 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 $this->setCrc32($value);
                 break;
             case 13:
+                if (!is_array($value)) {
+                    $v = trim(substr($value, 2, -2));
+                    $value = $v ? explode(' | ', $v) : array();
+                }
                 $this->setEp($value);
                 break;
             case 14:
@@ -2127,6 +2148,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         $this->container = null;
         $this->crc32 = null;
         $this->ep = null;
+        $this->ep_unserialized = null;
         $this->volume = null;
         $this->collection = null;
         $this->collection_unserialized = null;

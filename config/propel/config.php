@@ -15,12 +15,24 @@ $manager->setConfiguration(array (
     ),
   ),
   'classname' => '\\Propel\\Runtime\\Connection\\ConnectionWrapper',
-  'model_paths' =>
-  array (
-    0 => 'src',
-    1 => 'vendor',
-  ),
 ));
 $manager->setName('default');
 $serviceContainer->setConnectionManager('default', $manager);
+$serviceContainer->setAdapterClass('test', 'sqlite');
+$manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
+$manager->setConfiguration(array (
+  'dsn' => 'sqlite:test/db.sqlite3',
+  'user' => 'eater',
+  'password' => '',
+  'settings' =>
+  array (
+    'charset' => 'utf8',
+    'queries' =>
+    array (
+    ),
+  ),
+  'classname' => '\\Propel\\Runtime\\Connection\\ConnectionWrapper',
+));
+$manager->setName('test');
+$serviceContainer->setConnectionManager('test', $manager);
 $serviceContainer->setDefaultDatasource('default');

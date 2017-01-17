@@ -1,5 +1,7 @@
-.idea/
-build/
-vendor/
-composer.lock
+test/db.sqlite3
+vendor
+.idea
+test/data/sql
+build
 storage/
+composer.lock

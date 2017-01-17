@@ -1,32 +1,5 @@
 <?xml version="1.0"?>
 <database name="default" namespace="Odango\Hebi\Model" identifierQuoting="true">
-    <table name="crawl_item">
-        <column name="id" type="BIGINT" required="true" autoIncrement="true" primaryKey="true" />
-        <column name="target" type="varchar" size="255" />
-        <column name="external_id" type="BIGINT" />
-        <column name="status" type="varchar" size="50" />
-        <column name="type" type="varchar" size="50" />
-        <column name="last_updated" type="timestamp" />
-        <column name="last_success" type="timestamp" />
-
-        <index name="crawl_target_type">
-            <index-column name="target" />
-            <index-column name="type" />
-        </index>
-
-        <index name="crawl_target_id">
-            <index-column name="target" />
-            <index-column name="external_id" />
-        </index>
-
-        <index name="crawl_status">
-            <index-column name="status" />
-        </index>
-
-        <behavior name="timestampable">
-            <parameter name="update_column" value="last_updated"/>
-        </behavior>
-    </table>
     <table name="torrent">
         <column name="id" type="BIGINT" primaryKey="true" />
         <column name="info_hash" type="varchar" size="32" required="true" />
@@ -36,10 +9,6 @@
         <column name="trackers" type="array" />
         <column name="date_crawled" type="timestamp"/>
         <column name="last_updated" type="timestamp"/>
-
-        <foreign-key foreignTable="crawl_item">
-            <reference foreign="id" local="id"/>
-        </foreign-key>
 
         <behavior name="timestampable">
             <parameter name="create_column" value="date_crawled"/>
@@ -78,7 +47,7 @@
         <column name="source" type="varchar" size="255" />
         <column name="container" type="varchar" size="255" />
         <column name="crc32" type="varchar" size="255" />
-        <column name="ep" type="varchar" size="255" />
+        <column name="ep" type="array" size="255" />
         <column name="volume" type="varchar" size="255" />
         <column name="collection" type="array" size="255" />
 

@@ -94,7 +94,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata findOneBySource(string $source) Return the first ChildTorrentMetadata filtered by the source column
  * @method     ChildTorrentMetadata findOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column
  * @method     ChildTorrentMetadata findOneByCrc32(string $crc32) Return the first ChildTorrentMetadata filtered by the crc32 column
- * @method     ChildTorrentMetadata findOneByEp(string $ep) Return the first ChildTorrentMetadata filtered by the ep column
+ * @method     ChildTorrentMetadata findOneByEp(array $ep) Return the first ChildTorrentMetadata filtered by the ep column
  * @method     ChildTorrentMetadata findOneByVolume(string $volume) Return the first ChildTorrentMetadata filtered by the volume column
  * @method     ChildTorrentMetadata findOneByCollection(array $collection) Return the first ChildTorrentMetadata filtered by the collection column
  * @method     ChildTorrentMetadata findOneByDateCreated(string $date_created) Return the first ChildTorrentMetadata filtered by the date_created column
@@ -116,7 +116,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata requireOneBySource(string $source) Return the first ChildTorrentMetadata filtered by the source column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByCrc32(string $crc32) Return the first ChildTorrentMetadata filtered by the crc32 column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTorrentMetadata requireOneByEp(string $ep) Return the first ChildTorrentMetadata filtered by the ep column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentMetadata requireOneByEp(array $ep) Return the first ChildTorrentMetadata filtered by the ep column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByVolume(string $volume) Return the first ChildTorrentMetadata filtered by the volume column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByCollection(array $collection) Return the first ChildTorrentMetadata filtered by the collection column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByDateCreated(string $date_created) Return the first ChildTorrentMetadata filtered by the date_created column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -136,7 +136,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata[]|ObjectCollection findBySource(string $source) Return ChildTorrentMetadata objects filtered by the source column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByContainer(string $container) Return ChildTorrentMetadata objects filtered by the container column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByCrc32(string $crc32) Return ChildTorrentMetadata objects filtered by the crc32 column
- * @method     ChildTorrentMetadata[]|ObjectCollection findByEp(string $ep) Return ChildTorrentMetadata objects filtered by the ep column
+ * @method     ChildTorrentMetadata[]|ObjectCollection findByEp(array $ep) Return ChildTorrentMetadata objects filtered by the ep column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByVolume(string $volume) Return ChildTorrentMetadata objects filtered by the volume column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByCollection(array $collection) Return ChildTorrentMetadata objects filtered by the collection column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByDateCreated(string $date_created) Return ChildTorrentMetadata objects filtered by the date_created column
@@ -700,23 +700,48 @@ abstract class TorrentMetadataQuery extends ModelCriteria
     /**
      * Filter the query on the ep column
      *
-     * Example usage:
-     * <code>
-     * $query->filterByEp('fooValue');   // WHERE ep = 'fooValue'
-     * $query->filterByEp('%fooValue%', Criteria::LIKE); // WHERE ep LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $ep The value to use as filter.
+     * @param     array $ep The values to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
      */
     public function filterByEp($ep = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($ep)) {
-                $comparison = Criteria::IN;
+        $key = $this->getAliasedColName(TorrentMetadataTableMap::COL_EP);
+        if (null === $comparison || $comparison == Criteria::CONTAINS_ALL) {
+            foreach ($ep as $value) {
+                $value = '%| ' . $value . ' |%';
+                if ($this->containsKey($key)) {
+                    $this->addAnd($key, $value, Criteria::LIKE);
+                } else {
+                    $this->add($key, $value, Criteria::LIKE);
+                }
             }
+
+            return $this;
+        } elseif ($comparison == Criteria::CONTAINS_SOME) {
+            foreach ($ep as $value) {
+                $value = '%| ' . $value . ' |%';
+                if ($this->containsKey($key)) {
+                    $this->addOr($key, $value, Criteria::LIKE);
+                } else {
+                    $this->add($key, $value, Criteria::LIKE);
+                }
+            }
+
+            return $this;
+        } elseif ($comparison == Criteria::CONTAINS_NONE) {
+            foreach ($ep as $value) {
+                $value = '%| ' . $value . ' |%';
+                if ($this->containsKey($key)) {
+                    $this->addAnd($key, $value, Criteria::NOT_LIKE);
+                } else {
+                    $this->add($key, $value, Criteria::NOT_LIKE);
+                }
+            }
+            $this->addOr($key, null, Criteria::ISNULL);
+
+            return $this;
         }
 
         return $this->addUsingAlias(TorrentMetadataTableMap::COL_EP, $ep, $comparison);

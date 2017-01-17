@@ -2,8 +2,7 @@ hebi:
   log: storage/hebi.log
   nyaa:
     category:
-      - 1_37
-    proxy: 'http://proxy'
-    verify_ssl: false
-    batch: 10000
-    site: 'https://nyaa.se'
+      - '1_37'
+    page-path: '/remote/nyaa-mirror/pages/%d.html'
+    torrent-path: '/remote/nyaa-mirror/torrents/%d.torrent'
+    status-file: '/remote/nyaa-mirror/status.json'
