@@ -177,6 +177,20 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     protected $ep_unserialized;
 
     /**
+     * The value for the special field.
+     *
+     * @var        string
+     */
+    protected $special;
+
+    /**
+     * The value for the season field.
+     *
+     * @var        string
+     */
+    protected $season;
+
+    /**
      * The value for the volume field.
      *
      * @var        string
@@ -606,6 +620,26 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     }
 
     /**
+     * Get the [special] column value.
+     *
+     * @return string
+     */
+    public function getSpecial()
+    {
+        return $this->special;
+    }
+
+    /**
+     * Get the [season] column value.
+     *
+     * @return string
+     */
+    public function getSeason()
+    {
+        return $this->season;
+    }
+
+    /**
      * Get the [volume] column value.
      *
      * @return string
@@ -952,6 +986,46 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     } // setEp()
 
     /**
+     * Set the value of [special] column.
+     *
+     * @param string $v new value
+     * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
+     */
+    public function setSpecial($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->special !== $v) {
+            $this->special = $v;
+            $this->modifiedColumns[TorrentMetadataTableMap::COL_SPECIAL] = true;
+        }
+
+        return $this;
+    } // setSpecial()
+
+    /**
+     * Set the value of [season] column.
+     *
+     * @param string $v new value
+     * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
+     */
+    public function setSeason($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->season !== $v) {
+            $this->season = $v;
+            $this->modifiedColumns[TorrentMetadataTableMap::COL_SEASON] = true;
+        }
+
+        return $this;
+    } // setSeason()
+
+    /**
      * Set the value of [volume] column.
      *
      * @param string $v new value
@@ -1108,20 +1182,26 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $this->ep = $col;
             $this->ep_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : TorrentMetadataTableMap::translateFieldName('Volume', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : TorrentMetadataTableMap::translateFieldName('Special', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->special = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : TorrentMetadataTableMap::translateFieldName('Season', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->season = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : TorrentMetadataTableMap::translateFieldName('Volume', TableMap::TYPE_PHPNAME, $indexType)];
             $this->volume = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : TorrentMetadataTableMap::translateFieldName('Collection', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : TorrentMetadataTableMap::translateFieldName('Collection', TableMap::TYPE_PHPNAME, $indexType)];
             $this->collection = $col;
             $this->collection_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : TorrentMetadataTableMap::translateFieldName('DateCreated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : TorrentMetadataTableMap::translateFieldName('DateCreated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->date_created = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : TorrentMetadataTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : TorrentMetadataTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1134,7 +1214,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 18; // 18 = TorrentMetadataTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 20; // 20 = TorrentMetadataTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\TorrentMetadata'), 0, $e);
@@ -1401,6 +1481,12 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_EP)) {
             $modifiedColumns[':p' . $index++]  = '`ep`';
         }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_SPECIAL)) {
+            $modifiedColumns[':p' . $index++]  = '`special`';
+        }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_SEASON)) {
+            $modifiedColumns[':p' . $index++]  = '`season`';
+        }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_VOLUME)) {
             $modifiedColumns[':p' . $index++]  = '`volume`';
         }
@@ -1465,6 +1551,12 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                         break;
                     case '`ep`':
                         $stmt->bindValue($identifier, $this->ep, PDO::PARAM_STR);
+                        break;
+                    case '`special`':
+                        $stmt->bindValue($identifier, $this->special, PDO::PARAM_STR);
+                        break;
+                    case '`season`':
+                        $stmt->bindValue($identifier, $this->season, PDO::PARAM_INT);
                         break;
                     case '`volume`':
                         $stmt->bindValue($identifier, $this->volume, PDO::PARAM_STR);
@@ -1576,15 +1668,21 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 return $this->getEp();
                 break;
             case 14:
-                return $this->getVolume();
+                return $this->getSpecial();
                 break;
             case 15:
-                return $this->getCollection();
+                return $this->getSeason();
                 break;
             case 16:
-                return $this->getDateCreated();
+                return $this->getVolume();
                 break;
             case 17:
+                return $this->getCollection();
+                break;
+            case 18:
+                return $this->getDateCreated();
+                break;
+            case 19:
                 return $this->getLastUpdated();
                 break;
             default:
@@ -1631,17 +1729,19 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $keys[11] => $this->getContainer(),
             $keys[12] => $this->getCrc32(),
             $keys[13] => $this->getEp(),
-            $keys[14] => $this->getVolume(),
-            $keys[15] => $this->getCollection(),
-            $keys[16] => $this->getDateCreated(),
-            $keys[17] => $this->getLastUpdated(),
+            $keys[14] => $this->getSpecial(),
+            $keys[15] => $this->getSeason(),
+            $keys[16] => $this->getVolume(),
+            $keys[17] => $this->getCollection(),
+            $keys[18] => $this->getDateCreated(),
+            $keys[19] => $this->getLastUpdated(),
         );
-        if ($result[$keys[16]] instanceof \DateTime) {
-            $result[$keys[16]] = $result[$keys[16]]->format('c');
+        if ($result[$keys[18]] instanceof \DateTime) {
+            $result[$keys[18]] = $result[$keys[18]]->format('c');
         }
 
-        if ($result[$keys[17]] instanceof \DateTime) {
-            $result[$keys[17]] = $result[$keys[17]]->format('c');
+        if ($result[$keys[19]] instanceof \DateTime) {
+            $result[$keys[19]] = $result[$keys[19]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1750,19 +1850,25 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                 $this->setEp($value);
                 break;
             case 14:
-                $this->setVolume($value);
+                $this->setSpecial($value);
                 break;
             case 15:
+                $this->setSeason($value);
+                break;
+            case 16:
+                $this->setVolume($value);
+                break;
+            case 17:
                 if (!is_array($value)) {
                     $v = trim(substr($value, 2, -2));
                     $value = $v ? explode(' | ', $v) : array();
                 }
                 $this->setCollection($value);
                 break;
-            case 16:
+            case 18:
                 $this->setDateCreated($value);
                 break;
-            case 17:
+            case 19:
                 $this->setLastUpdated($value);
                 break;
         } // switch()
@@ -1834,16 +1940,22 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $this->setEp($arr[$keys[13]]);
         }
         if (array_key_exists($keys[14], $arr)) {
-            $this->setVolume($arr[$keys[14]]);
+            $this->setSpecial($arr[$keys[14]]);
         }
         if (array_key_exists($keys[15], $arr)) {
-            $this->setCollection($arr[$keys[15]]);
+            $this->setSeason($arr[$keys[15]]);
         }
         if (array_key_exists($keys[16], $arr)) {
-            $this->setDateCreated($arr[$keys[16]]);
+            $this->setVolume($arr[$keys[16]]);
         }
         if (array_key_exists($keys[17], $arr)) {
-            $this->setLastUpdated($arr[$keys[17]]);
+            $this->setCollection($arr[$keys[17]]);
+        }
+        if (array_key_exists($keys[18], $arr)) {
+            $this->setDateCreated($arr[$keys[18]]);
+        }
+        if (array_key_exists($keys[19], $arr)) {
+            $this->setLastUpdated($arr[$keys[19]]);
         }
     }
 
@@ -1927,6 +2039,12 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_EP)) {
             $criteria->add(TorrentMetadataTableMap::COL_EP, $this->ep);
+        }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_SPECIAL)) {
+            $criteria->add(TorrentMetadataTableMap::COL_SPECIAL, $this->special);
+        }
+        if ($this->isColumnModified(TorrentMetadataTableMap::COL_SEASON)) {
+            $criteria->add(TorrentMetadataTableMap::COL_SEASON, $this->season);
         }
         if ($this->isColumnModified(TorrentMetadataTableMap::COL_VOLUME)) {
             $criteria->add(TorrentMetadataTableMap::COL_VOLUME, $this->volume);
@@ -2047,6 +2165,8 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         $copyObj->setContainer($this->getContainer());
         $copyObj->setCrc32($this->getCrc32());
         $copyObj->setEp($this->getEp());
+        $copyObj->setSpecial($this->getSpecial());
+        $copyObj->setSeason($this->getSeason());
         $copyObj->setVolume($this->getVolume());
         $copyObj->setCollection($this->getCollection());
         $copyObj->setDateCreated($this->getDateCreated());
@@ -2149,6 +2269,8 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         $this->crc32 = null;
         $this->ep = null;
         $this->ep_unserialized = null;
+        $this->special = null;
+        $this->season = null;
         $this->volume = null;
         $this->collection = null;
         $this->collection_unserialized = null;

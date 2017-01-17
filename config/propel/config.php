@@ -18,21 +18,4 @@ $manager->setConfiguration(array (
 ));
 $manager->setName('default');
 $serviceContainer->setConnectionManager('default', $manager);
-$serviceContainer->setAdapterClass('test', 'sqlite');
-$manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
-$manager->setConfiguration(array (
-  'dsn' => 'sqlite:test/db.sqlite3',
-  'user' => 'eater',
-  'password' => '',
-  'settings' =>
-  array (
-    'charset' => 'utf8',
-    'queries' =>
-    array (
-    ),
-  ),
-  'classname' => '\\Propel\\Runtime\\Connection\\ConnectionWrapper',
-));
-$manager->setName('test');
-$serviceContainer->setConnectionManager('test', $manager);
 $serviceContainer->setDefaultDatasource('default');

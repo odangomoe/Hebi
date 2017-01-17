@@ -35,4 +35,32 @@ class TorrentMetadata extends BaseTorrentMetadata
             $this->{$func}($value);
         }
     }
+
+    private function normalizeArray($arr) {
+        foreach ($arr as $key => $item) {
+            if (is_array($item)) {
+                $arr[$key] = $this->normalizeArray($item);
+            } else {
+                $arr[$key] = "{$item}";
+            }
+        }
+
+        return $arr;
+    }
+
+    public function hasChanged(TorrentMetadata $metadata) {
+        $a = $this->toArray();
+        $b = $metadata->toArray();
+        $toUnset = ["DateCreated", "LastUpdated"];
+
+        $a = $this->normalizeArray($a);
+        $b = $this->normalizeArray($b);
+
+        foreach ($toUnset as $key) {
+            unset($a[$key]);
+            unset($b[$key]);
+        }
+
+        return $a !== $b;
+    }
 }

@@ -34,6 +34,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery orderByContainer($order = Criteria::ASC) Order by the container column
  * @method     ChildTorrentMetadataQuery orderByCrc32($order = Criteria::ASC) Order by the crc32 column
  * @method     ChildTorrentMetadataQuery orderByEp($order = Criteria::ASC) Order by the ep column
+ * @method     ChildTorrentMetadataQuery orderBySpecial($order = Criteria::ASC) Order by the special column
+ * @method     ChildTorrentMetadataQuery orderBySeason($order = Criteria::ASC) Order by the season column
  * @method     ChildTorrentMetadataQuery orderByVolume($order = Criteria::ASC) Order by the volume column
  * @method     ChildTorrentMetadataQuery orderByCollection($order = Criteria::ASC) Order by the collection column
  * @method     ChildTorrentMetadataQuery orderByDateCreated($order = Criteria::ASC) Order by the date_created column
@@ -53,6 +55,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery groupByContainer() Group by the container column
  * @method     ChildTorrentMetadataQuery groupByCrc32() Group by the crc32 column
  * @method     ChildTorrentMetadataQuery groupByEp() Group by the ep column
+ * @method     ChildTorrentMetadataQuery groupBySpecial() Group by the special column
+ * @method     ChildTorrentMetadataQuery groupBySeason() Group by the season column
  * @method     ChildTorrentMetadataQuery groupByVolume() Group by the volume column
  * @method     ChildTorrentMetadataQuery groupByCollection() Group by the collection column
  * @method     ChildTorrentMetadataQuery groupByDateCreated() Group by the date_created column
@@ -95,6 +99,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata findOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column
  * @method     ChildTorrentMetadata findOneByCrc32(string $crc32) Return the first ChildTorrentMetadata filtered by the crc32 column
  * @method     ChildTorrentMetadata findOneByEp(array $ep) Return the first ChildTorrentMetadata filtered by the ep column
+ * @method     ChildTorrentMetadata findOneBySpecial(string $special) Return the first ChildTorrentMetadata filtered by the special column
+ * @method     ChildTorrentMetadata findOneBySeason(string $season) Return the first ChildTorrentMetadata filtered by the season column
  * @method     ChildTorrentMetadata findOneByVolume(string $volume) Return the first ChildTorrentMetadata filtered by the volume column
  * @method     ChildTorrentMetadata findOneByCollection(array $collection) Return the first ChildTorrentMetadata filtered by the collection column
  * @method     ChildTorrentMetadata findOneByDateCreated(string $date_created) Return the first ChildTorrentMetadata filtered by the date_created column
@@ -117,6 +123,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata requireOneByContainer(string $container) Return the first ChildTorrentMetadata filtered by the container column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByCrc32(string $crc32) Return the first ChildTorrentMetadata filtered by the crc32 column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByEp(array $ep) Return the first ChildTorrentMetadata filtered by the ep column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentMetadata requireOneBySpecial(string $special) Return the first ChildTorrentMetadata filtered by the special column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentMetadata requireOneBySeason(string $season) Return the first ChildTorrentMetadata filtered by the season column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByVolume(string $volume) Return the first ChildTorrentMetadata filtered by the volume column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByCollection(array $collection) Return the first ChildTorrentMetadata filtered by the collection column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentMetadata requireOneByDateCreated(string $date_created) Return the first ChildTorrentMetadata filtered by the date_created column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -137,6 +145,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadata[]|ObjectCollection findByContainer(string $container) Return ChildTorrentMetadata objects filtered by the container column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByCrc32(string $crc32) Return ChildTorrentMetadata objects filtered by the crc32 column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByEp(array $ep) Return ChildTorrentMetadata objects filtered by the ep column
+ * @method     ChildTorrentMetadata[]|ObjectCollection findBySpecial(string $special) Return ChildTorrentMetadata objects filtered by the special column
+ * @method     ChildTorrentMetadata[]|ObjectCollection findBySeason(string $season) Return ChildTorrentMetadata objects filtered by the season column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByVolume(string $volume) Return ChildTorrentMetadata objects filtered by the volume column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByCollection(array $collection) Return ChildTorrentMetadata objects filtered by the collection column
  * @method     ChildTorrentMetadata[]|ObjectCollection findByDateCreated(string $date_created) Return ChildTorrentMetadata objects filtered by the date_created column
@@ -239,7 +249,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `torrent_id`, `name`, `type`, `version`, `group`, `unparsed`, `resolution`, `video`, `video_depth`, `audio`, `source`, `container`, `crc32`, `ep`, `volume`, `collection`, `date_created`, `last_updated` FROM `torrent_metadata` WHERE `torrent_id` = :p0';
+        $sql = 'SELECT `torrent_id`, `name`, `type`, `version`, `group`, `unparsed`, `resolution`, `video`, `video_depth`, `audio`, `source`, `container`, `crc32`, `ep`, `special`, `season`, `volume`, `collection`, `date_created`, `last_updated` FROM `torrent_metadata` WHERE `torrent_id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -745,6 +755,72 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TorrentMetadataTableMap::COL_EP, $ep, $comparison);
+    }
+
+    /**
+     * Filter the query on the special column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySpecial('fooValue');   // WHERE special = 'fooValue'
+     * $query->filterBySpecial('%fooValue%', Criteria::LIKE); // WHERE special LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $special The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
+     */
+    public function filterBySpecial($special = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($special)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TorrentMetadataTableMap::COL_SPECIAL, $special, $comparison);
+    }
+
+    /**
+     * Filter the query on the season column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySeason(1234); // WHERE season = 1234
+     * $query->filterBySeason(array(12, 34)); // WHERE season IN (12, 34)
+     * $query->filterBySeason(array('min' => 12)); // WHERE season > 12
+     * </code>
+     *
+     * @param     mixed $season The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
+     */
+    public function filterBySeason($season = null, $comparison = null)
+    {
+        if (is_array($season)) {
+            $useMinMax = false;
+            if (isset($season['min'])) {
+                $this->addUsingAlias(TorrentMetadataTableMap::COL_SEASON, $season['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($season['max'])) {
+                $this->addUsingAlias(TorrentMetadataTableMap::COL_SEASON, $season['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TorrentMetadataTableMap::COL_SEASON, $season, $comparison);
     }
 
     /**

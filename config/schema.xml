@@ -49,6 +49,8 @@
         <column name="container" type="varchar" size="255" />
         <column name="crc32" type="varchar" size="255" />
         <column name="ep" type="array" size="255" />
+        <column name="special" type="varchar" size="255" />
+        <column name="season" type="bigint" size="255" />
         <column name="volume" type="varchar" size="255" />
         <column name="collection" type="array" size="255" />
 

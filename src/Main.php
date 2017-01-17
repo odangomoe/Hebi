@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Odango\Hebi\AniDB\Importer;
+use Odango\Hebi\Atama\Updater;
 use Odango\Hebi\Nyaa\Iterator;
 use Pimple\Container;
 use Propel\Runtime\Propel;
@@ -88,6 +89,9 @@ class Main
                 $importer = new Importer($this->container);
                 $importer->run();
                 break;
+            case 'atama':
+                $updater = new Updater($this->container);
+                $updater->run();
             default:
                 echo "Action '{$action}' doesn't exist\n";
                 exit(1);

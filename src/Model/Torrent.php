@@ -16,14 +16,31 @@ use Odango\Hebi\Model\Base\Torrent as BaseTorrent;
  */
 class Torrent extends BaseTorrent
 {
-    public function createMetadata($conn = null) {
+    public function createMetadata($conn = null): bool {
         $metadata = $this->getTorrentMetadata();
+        $oldMetadata = null;
         if ($metadata === null) {
             $metadata = new TorrentMetadata();
-            $metadata->setTorrent($this);
+        } else {
+            $oldMetadata = clone $metadata;
+            $metadata->clear();
+            $metadata->setNew(false);
+            $metadata->setDateCreated($oldMetadata->getDateCreated());
         }
 
+        $metadata->setTorrent($this);
         $metadata->applyTitle($this->getTorrentTitle());
-        $metadata->save($conn);
+
+        if ($oldMetadata === null || $metadata->hasChanged($oldMetadata)) {
+            $metadata->save($conn);
+            return true;
+        }
+
+        return false;
     }
+
+    /**
+     * Fixes a bug in PropelORM generator
+     */
+    public function removeTorrentMetadata(){}
 }

@@ -52,4 +52,10 @@ class IteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $torrents);
         $this->assertCount(2, $torrentMetadata);
     }
+
+    public function tearDown()
+    {
+        TorrentMetadataQuery::create()->deleteAll();
+        TorrentQuery::create()->deleteAll();
+    }
 }
