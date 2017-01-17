@@ -212,7 +212,7 @@ class TorrentMetadataTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('torrent_id', 'TorrentId', 'BIGINT' , 'torrent', 'id', true, null, null);
-        $this->addColumn('name', 'Name', 'LONGVARCHAR', false, 255, null);
+        $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
         $this->addColumn('type', 'Type', 'VARCHAR', false, 255, null);
         $this->addColumn('version', 'Version', 'VARCHAR', false, 255, null);
         $this->addColumn('group', 'Group', 'VARCHAR', false, 255, null);

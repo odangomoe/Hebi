@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <database name="default" namespace="Odango\Hebi\Model" identifierQuoting="true">
+    <!-- NyaaTorrents Store -->
     <table name="torrent">
         <column name="id" type="BIGINT" primaryKey="true" />
         <column name="info_hash" type="varchar" size="32" required="true" />
@@ -35,7 +36,7 @@
     <table name="torrent_metadata">
         <column name="torrent_id" type="BIGINT" required="true" primaryKey="true" />
 
-        <column name="name" type="LONGVARCHAR" size="255" />
+        <column name="name" type="LONGVARCHAR" />
         <column name="type" type="varchar" size="255" />
         <column name="version" type="varchar" size="255" />
         <column name="group" type="varchar" size="255" />
@@ -63,5 +64,21 @@
             <parameter name="create_column" value="date_created"/>
             <parameter name="update_column" value="last_updated"/>
         </behavior>
+    </table>
+
+    <!-- AniDB Store -->
+    <table name="anime_title">
+        <column name="id" type="BIGINT" required="true" primaryKey="true" autoincrement="true" />
+        <column name="anime_id" type="BIGINT" required="true"/>
+        <column name="main" type="boolean" />
+        <column name="name" type="varchar" size="255" />
+
+        <index name="title_name">
+            <index-column name="name" size="200" />
+        </index>
+
+        <index name="title_anime_id">
+            <index-column name="anime_id" />
+        </index>
     </table>
 </database>

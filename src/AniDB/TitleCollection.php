@@ -2,6 +2,8 @@
 
 namespace Odango\Hebi\AniDB;
 
+use Odango\Hebi\Model\AnimeTitle;
+
 class TitleCollection
 {
     /**
@@ -18,12 +20,12 @@ class TitleCollection
     }
 
     /**
-     * @var Title[]
+     * @var AnimeTitle[]
      */
     private $titles= [];
 
     /**
-     * @return Title[]
+     * @return AnimeTitle[]
      */
     public function getTitles(): array
     {
@@ -37,15 +39,37 @@ class TitleCollection
         $col->animeId = $animeIdAttr->value;
 
         foreach ($node->childNodes as $child) {
-            if(Title::isAcceptable($child)) {
-                $col->titles[] = Title::createFromNode($child);
+            if(AnimeTitle::isAcceptable($child)) {
+                $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId());
             }
         }
+
+        $col->cleanTitles();
 
         return $col;
     }
 
-    /** @var Title */
+    private function cleanTitles() {
+        $saved = [];
+        $titles = [];
+        $mainTitle = $this->getMainTitle();
+
+        if ($mainTitle !== null) {
+            $saved[] = $mainTitle;
+            $titles[] = $mainTitle->getName();
+        }
+
+        foreach ($this->getTitles() as $title) {
+            if (!in_array($title->getName(), $titles)) {
+                $saved[] = $title;
+                $titles[] = $title->getName();
+            }
+        }
+
+        $this->titles = $saved;
+    }
+
+    /** @var AnimeTitle */
     private $mainTitle;
 
     public function getMainTitle() {
@@ -54,7 +78,7 @@ class TitleCollection
         }
 
         foreach ($this->titles as $title) {
-            if ($title->isMain()) {
+            if ($title->getMain()) {
                 $this->mainTitle = $title;
                 return $this->mainTitle;
             }
@@ -71,5 +95,11 @@ class TitleCollection
         }
 
         return $title->getName();
+    }
+
+    public function save($conn = null) {
+        foreach ($this->getTitles() as $title) {
+            $title->save($conn);
+        }
     }
 }

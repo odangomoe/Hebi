@@ -46,7 +46,7 @@ class DumpReader extends Reader
      */
     public function getAllTitleCollections(): array {
         $items = [];
-        while (($item =$this->getNextTitleCollection()) !== null) {
+        while (($item = $this->getNextTitleCollection()) !== null) {
             $items[] = $item;
         }
 

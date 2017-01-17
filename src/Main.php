@@ -5,10 +5,9 @@ namespace Odango\Hebi;
 
 
 use GuzzleHttp\Client;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Odango\Hebi\AniDB\Importer;
 use Odango\Hebi\Nyaa\Iterator;
 use Pimple\Container;
 use Propel\Runtime\Propel;
@@ -75,6 +74,7 @@ class Main
 
     /**
      * @codeCoverageIgnore
+     * @param $action string
      */
     public function run($action) {
         $this->init();
@@ -83,6 +83,10 @@ class Main
             case 'nyaa':
                 $crawler = new Iterator($this->container);
                 $crawler->start();
+                break;
+            case 'anidb':
+                $importer = new Importer($this->container);
+                $importer->run();
                 break;
             default:
                 echo "Action '{$action}' doesn't exist\n";
