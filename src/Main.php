@@ -21,26 +21,31 @@ class Main
      */
     private $container;
 
-    public function init() {
+    public function init($connection = null) {
         $this->initContainer();
         $this->container['main'] = $this;
         $this->initConfig();
         $this->initLogger();
-        $this->initPropel();
+        $this->initPropel($connection);
         $this->initGuzzle([]);
-        $this->initFileSystem();
+        ini_set('memory_limit', -1);
     }
 
-    public function initFileSystem() {
-        $this->container['filesystem'] = new Filesystem(new Local(__DIR__ . '/../storage/objects'));
+    public function getContainer(): Container {
+        return $this->container;
     }
 
     public function initGuzzle($options) {
         $this->container['guzzle'] = new Client($options);
     }
 
-    public function initPropel() {
-        include __DIR__ . '/../config/propel/config.php';
+    public function initPropel($config = null) {
+        $prefix = "";
+        if ($config !== null) {
+            $prefix = $config . '-';
+        }
+
+        include __DIR__ . '/../config/propel/' . $prefix . 'config.php';
         Propel::getServiceContainer()->setLogger('defaultLogger', $this->container['logger']);
     }
 
@@ -68,6 +73,9 @@ class Main
         $this->container['config'] = Yaml::parse(file_get_contents(__DIR__ . '/../config/hebi.yml'))['hebi'] ?? [];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function run($action) {
         $this->init();
 

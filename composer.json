@@ -27,7 +27,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Odango\\Hebi\\": "src/",
+            "Odango\\Hebi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Odango\\Hebi\\Test\\": "test/"
         }
     }

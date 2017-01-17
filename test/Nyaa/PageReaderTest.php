@@ -4,6 +4,7 @@
 namespace Odango\Hebi\Test\Nyaa;
 
 
+use Odango\Hebi\Nyaa\PageInfo;
 use Odango\Hebi\Nyaa\PageReader;
 
 class PageReaderTest extends \PHPUnit_Framework_TestCase
@@ -30,5 +31,6 @@ class PageReaderTest extends \PHPUnit_Framework_TestCase
         $info = $pageReader->extractInfo();
 
         $this->assertFalse($info->getIsFound());
+        $this->assertEquals("", $info->getTitle());
     }
 }

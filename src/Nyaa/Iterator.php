@@ -4,6 +4,7 @@
 namespace Odango\Hebi\Nyaa;
 
 use Bcn\Component\Json\Reader;
+use Monolog\Logger;
 use Odango\Hebi\Model\Map\TorrentTableMap;
 use Odango\Hebi\Model\Torrent;
 use Odango\Hebi\Model\TorrentQuery;
@@ -15,9 +16,6 @@ class Iterator
 {
     protected $container;
     protected $config;
-    private $amountInTransaction = 0;
-    /** @var  ConnectionInterface */
-    private $transactionConnection;
     protected $statusFileHandler;
 
     public function __construct(Container $container)
@@ -25,9 +23,12 @@ class Iterator
         $this->container = $container;
     }
 
+    private function getLogger(): Logger {
+        return $this->container['logger'];
+    }
+
     public function start() {
         $this->config = $this->container['config']['nyaa'];
-        $this->transactionConnection = Propel::getWriteConnection(TorrentTableMap::DATABASE_NAME);
 
         $this->statusFileHandler = fopen($this->config['status-file'], 'r');
         $reader = new Reader($this->statusFileHandler);
@@ -35,10 +36,10 @@ class Iterator
         $reader->enter("items", Reader::TYPE_ARRAY);
         while ($item = $reader->read()) {
             try {
-                echo "Processing torrent#{$item['id']}\n";
+                $this->getLogger()->debug("Processing torrent#{$item['id']}");
                 $this->process($item);
             } catch (\Exception $e) {
-                echo "torrent#{$item['id']} failed: " . $e->getMessage();
+                $this->getLogger()->debug("torrent#{$item['id']} failed: " . $e->getMessage());
             }
         }
 
@@ -51,28 +52,24 @@ class Iterator
         $status = $item['status'];
 
         if ($status !== 'success' || !$item['hasTorrent']) {
+            $this->getLogger()->debug("Quiting early for torrent#{$id}");
             return;
         }
 
         $pageInfo = $this->readPageInfo($item);
         if (!$pageInfo->getIsFound()) {
+            $this->getLogger()->debug("Hit not found page for torrent#{$id}");
             return;
         }
 
-        if (!in_array($pageInfo->getCategoryId(), $this->config['category'])) {
+        $cg = $pageInfo->getCategoryId();
+        $acg = implode(', ', $this->config['category']);
+        if (!in_array($cg, $this->config['category'])) {
+            $this->getLogger()->debug("Wrong category ({$cg} not in {$acg}) for torrent#{$id}");
             return;
         }
 
-        echo "Saving torrent#{$id}\n";
-
-        if ($this->amountInTransaction > 100) {
-            $this->transactionConnection->commit();
-            $this->amountInTransaction = 0;
-        }
-
-        if ($this->amountInTransaction === 0) {
-            $this->transactionConnection->beginTransaction();
-        }
+        $this->getLogger()->debug("Saving torrent#{$id}");
 
         $torrentPath = sprintf($this->config['torrent-path'], $id);
 
@@ -87,25 +84,21 @@ class Iterator
             return;
         }
 
+        $torrentObj->setId($pageInfo->getTorrentId());
         $torrentObj->setDateCrawled($item['succeededAt'] / 1000);
         $torrentObj->setTrackers($torrentReader->getTrackers());
         $torrentObj->setInfoHash($torrentReader->getInfoHash());
         $torrentObj->setTorrentTitle($pageInfo->getTitle());
         $torrentObj->setCachedTorrentFile($torrentPath);
         $torrentObj->setSubmitterId($pageInfo->getSubmitterId());
-        $torrentObj->save($this->transactionConnection);
-        $torrentObj->createMetadata($this->transactionConnection);
-        echo "Saved torrent#" . $id . "\n";
-        $this->amountInTransaction++;
+        $torrentObj->save();
+        $torrentObj->createMetadata();
+        $this->getLogger()->debug("Saved torrent#" . $id);
     }
 
     public function readPageInfo($item): PageInfo {
         $pagePath = sprintf($this->config['page-path'], $item['id']);
         $page = file_get_contents($pagePath);
-
-        if (!$page) {
-            throw new \Exception("Couldn't read the page of torrent#" . $item['id']);
-        }
 
         /** @var PageReader $pageReader */
         $pageReader = PageReader::createFromSource($page);

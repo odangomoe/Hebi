@@ -161,7 +161,7 @@ class TorrentTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('id', 'Id', 'BIGINT' , 'crawl_item', 'id', true, null, null);
+        $this->addPrimaryKey('id', 'Id', 'BIGINT', true, null, null);
         $this->addColumn('info_hash', 'InfoHash', 'VARCHAR', true, 32, null);
         $this->addColumn('cached_torrent_file', 'CachedTorrentFile', 'LONGVARCHAR', false, null, null);
         $this->addColumn('torrent_title', 'TorrentTitle', 'LONGVARCHAR', false, null, null);
@@ -176,13 +176,6 @@ class TorrentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CrawlItem', '\\Odango\\Hebi\\Model\\CrawlItem', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':id',
-    1 => ':id',
-  ),
-), null, null, null, false);
         $this->addRelation('TorrentStatus', '\\Odango\\Hebi\\Model\\TorrentStatus', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (

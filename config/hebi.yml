@@ -2,7 +2,7 @@ hebi:
   log: storage/hebi.log
   nyaa:
     category:
-      - 1_37
-    page-path: '/media/INTENSO/pages/%d.html'
-    torrent-path: '/media/INTENSO/torrents/%d.torrent'
-    status-file: '/home/eater/projects/hebi-neko/status.json'
+      - '1_37'
+    page-path: '/remote/nyaa-mirror/pages/%d.html'
+    torrent-path: '/remote/nyaa-mirror/torrents/%d.torrent'
+    status-file: '/remote/nyaa-mirror/status.json'

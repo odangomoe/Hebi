@@ -2,7 +2,7 @@
     <anime aid="1">
         <title type="short" xml:lang="en">CotS</title>
         <title type="official" xml:lang="fr">Crest of the Stars</title>
-        <title type="official" xml:lang="en">Crest of the Stars</title>
+        <title xml:lang="en">Crest of the Stars</title>
         <title xml:lang="pl" type="official">Crest of the Stars</title>
         <title xml:lang="cs" type="syn">Hvězdný erb</title>
         <title xml:lang="x-jat" type="main">Seikai no Monshou</title>

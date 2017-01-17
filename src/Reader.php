@@ -1,13 +1,15 @@
 <?php
 
 
-namespace Odango\Hebi\Nyaa;
+namespace Odango\Hebi;
 
 
 use DOMWrap\Document;
 
 abstract class Reader
 {
+
+
     /**
      * @var string
      */
@@ -55,7 +57,7 @@ abstract class Reader
         $this->source = $source;
     }
 
-    static public function createFromSource($source): Reader {
+    static public function createFromSource($source) {
         $reader = new static();
         $reader->setSource($source);
         return $reader;

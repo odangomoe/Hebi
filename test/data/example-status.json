@@ -1,0 +1,44 @@
+{
+    "items": [
+        {
+            "status": "error",
+            "id": 1
+        },
+        {
+            "status": "success",
+            "id": 2,
+            "hasTorrent": true,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 825702,
+            "hasTorrent": true,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 758916,
+            "hasTorrent": false,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 889117,
+            "hasTorrent": true,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 454443,
+            "hasTorrent": true,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 758916,
+            "hasTorrent": true,
+            "succeededAt": 0
+        }
+    ]
+}

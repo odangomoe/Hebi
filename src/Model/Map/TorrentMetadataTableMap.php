@@ -224,7 +224,7 @@ class TorrentMetadataTableMap extends TableMap
         $this->addColumn('source', 'Source', 'VARCHAR', false, 255, null);
         $this->addColumn('container', 'Container', 'VARCHAR', false, 255, null);
         $this->addColumn('crc32', 'Crc32', 'VARCHAR', false, 255, null);
-        $this->addColumn('ep', 'Ep', 'VARCHAR', false, 255, null);
+        $this->addColumn('ep', 'Ep', 'ARRAY', false, 255, null);
         $this->addColumn('volume', 'Volume', 'VARCHAR', false, 255, null);
         $this->addColumn('collection', 'Collection', 'ARRAY', false, 255, null);
         $this->addColumn('date_created', 'DateCreated', 'TIMESTAMP', false, null, null);

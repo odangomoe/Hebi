@@ -1,0 +1,18 @@
+propel:
+    paths:
+        schemaDir: config
+        phpDir: src/Model
+        migrationDir: storage/migrations
+        sqlDir: storage/sql
+        phpConfDir: config/propel
+    database:
+        connections:
+            default:
+                adapter: sqlite
+                dsn: sqlite:test/db.sqlite3
+                user: '%env.USER%'
+                password: ''
+                settings:
+                    charset: utf8
+    generator:
+        namespaceAutoPackage: false
