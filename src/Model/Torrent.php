@@ -43,10 +43,4 @@ class Torrent extends BaseTorrent
      * Fixes a bug in PropelORM generator
      */
     public function removeTorrentMetadata(){}
-
-    public function setTrackers($v)
-    {
-        $this->setMainTracker(reset($v));
-        return parent::setTrackers($v);
-    }
 }

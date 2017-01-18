@@ -8,7 +8,6 @@
         <column name="torrent_title" type="LONGVARCHAR" />
         <column name="submitter_id" type="BIGINT" />
         <column name="trackers" type="array" />
-        <column name="main_tracker" type="varchar" size="255" />
         <column name="date_crawled" type="timestamp"/>
         <column name="last_updated" type="timestamp"/>
 
@@ -20,9 +19,12 @@
     <table name="torrent_status">
         <column name="torrent_id" type="BIGINT" required="true" primaryKey="true"  />
 
+        <column name="tracker" type="varchar" size="255" />
+
         <column name="seeders" type="bigint" />
         <column name="leechers" type="bigint" />
         <column name="downloaded" type="bigint" />
+
 
         <column name="last_updated" type="timestamp"/>
 
