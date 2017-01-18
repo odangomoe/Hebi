@@ -2,11 +2,21 @@
     "items": [
         {
             "status": "error",
-            "id": 1
+            "id": 2
+        },
+        {
+            "status": "error",
+            "id": 10000000001
         },
         {
             "status": "success",
-            "id": 2,
+            "id": 10000000002,
+            "hasTorrent": true,
+            "succeededAt": 0
+        },
+        {
+            "status": "success",
+            "id": 15,
             "hasTorrent": true,
             "succeededAt": 0
         },

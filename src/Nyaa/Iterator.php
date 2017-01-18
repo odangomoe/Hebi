@@ -9,6 +9,7 @@ use Odango\Hebi\Model\Map\TorrentTableMap;
 use Odango\Hebi\Model\Torrent;
 use Odango\Hebi\Model\TorrentQuery;
 use Pimple\Container;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 
@@ -30,12 +31,20 @@ class Iterator
     public function start() {
         $this->config = $this->container['config']['nyaa'];
 
+        $item = TorrentQuery::create()->orderById(Criteria::DESC)->findOne();
+        $startAt = $item->getId();
+        $this->getLogger()->debug("Latest item in DB is torrent#{$startAt} skipping everything before");
+
         $this->statusFileHandler = fopen($this->config['status-file'], 'r');
         $reader = new Reader($this->statusFileHandler);
         $reader->enter(Reader::TYPE_OBJECT);
         $reader->enter("items", Reader::TYPE_ARRAY);
         while ($item = $reader->read()) {
             try {
+                if ($item['id'] < $startAt) {
+                    continue;
+                }
+
                 $this->getLogger()->debug("Processing torrent#{$item['id']}");
                 $this->process($item);
             } catch (\Exception $e) {

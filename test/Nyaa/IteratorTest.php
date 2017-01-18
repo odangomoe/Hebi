@@ -34,7 +34,7 @@ class IteratorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $torrent = new Torrent();
-        $torrent->setId(825702);
+        $torrent->setId(15);
         $torrent->setSubmitterId(64513);
         $torrent->setInfoHash("henk");
         $torrent->setTorrentTitle("[HorribleSubs] Kabaneri of the Iron Fortress - 12 [1080p].mkv");
@@ -49,8 +49,8 @@ class IteratorTest extends \PHPUnit_Framework_TestCase
         $torrents = TorrentQuery::create()->find();
         $torrentMetadata = TorrentMetadataQuery::create()->find();
 
-        $this->assertCount(2, $torrents);
-        $this->assertCount(2, $torrentMetadata);
+        $this->assertCount(3, $torrents);
+        $this->assertCount(3, $torrentMetadata);
     }
 
     public function tearDown()
