@@ -66,19 +66,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentMetadataQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildTorrentMetadataQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildTorrentMetadataQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildTorrentMetadataQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildTorrentMetadataQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
  * @method     ChildTorrentMetadataQuery leftJoinTorrent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Torrent relation
  * @method     ChildTorrentMetadataQuery rightJoinTorrent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Torrent relation
  * @method     ChildTorrentMetadataQuery innerJoinTorrent($relationAlias = null) Adds a INNER JOIN clause to the query using the Torrent relation
- *
- * @method     ChildTorrentMetadataQuery joinWithTorrent($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Torrent relation
- *
- * @method     ChildTorrentMetadataQuery leftJoinWithTorrent() Adds a LEFT JOIN clause and with to the query using the Torrent relation
- * @method     ChildTorrentMetadataQuery rightJoinWithTorrent() Adds a RIGHT JOIN clause and with to the query using the Torrent relation
- * @method     ChildTorrentMetadataQuery innerJoinWithTorrent() Adds a INNER JOIN clause and with to the query using the Torrent relation
  *
  * @method     \Odango\Hebi\Model\TorrentQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
@@ -213,27 +203,21 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TorrentMetadataTableMap::DATABASE_NAME);
-        }
-
-        $this->basePreSelect($con);
-
-        if (
-            $this->formatter || $this->modelAlias || $this->with || $this->select
-            || $this->selectColumns || $this->asColumns || $this->selectModifiers
-            || $this->map || $this->having || $this->joins
-        ) {
-            return $this->findPkComplex($key, $con);
-        }
-
-        if ((null !== ($obj = TorrentMetadataTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = TorrentMetadataTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
-
-        return $this->findPkSimple($key, $con);
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(TorrentMetadataTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
     }
 
     /**
@@ -263,7 +247,7 @@ abstract class TorrentMetadataQuery extends ModelCriteria
             /** @var ChildTorrentMetadata $obj */
             $obj = new ChildTorrentMetadata();
             $obj->hydrate($row);
-            TorrentMetadataTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            TorrentMetadataTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -388,10 +372,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
+     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
      * @param     string $name The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -401,6 +386,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($name)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $name)) {
+                $name = str_replace('*', '%', $name);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -413,10 +401,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByType('fooValue');   // WHERE type = 'fooValue'
-     * $query->filterByType('%fooValue%', Criteria::LIKE); // WHERE type LIKE '%fooValue%'
+     * $query->filterByType('%fooValue%'); // WHERE type LIKE '%fooValue%'
      * </code>
      *
      * @param     string $type The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -426,6 +415,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($type)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $type)) {
+                $type = str_replace('*', '%', $type);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -438,10 +430,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByVersion('fooValue');   // WHERE version = 'fooValue'
-     * $query->filterByVersion('%fooValue%', Criteria::LIKE); // WHERE version LIKE '%fooValue%'
+     * $query->filterByVersion('%fooValue%'); // WHERE version LIKE '%fooValue%'
      * </code>
      *
      * @param     string $version The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -451,6 +444,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($version)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $version)) {
+                $version = str_replace('*', '%', $version);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -463,10 +459,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByGroup('fooValue');   // WHERE group = 'fooValue'
-     * $query->filterByGroup('%fooValue%', Criteria::LIKE); // WHERE group LIKE '%fooValue%'
+     * $query->filterByGroup('%fooValue%'); // WHERE group LIKE '%fooValue%'
      * </code>
      *
      * @param     string $group The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -476,6 +473,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($group)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $group)) {
+                $group = str_replace('*', '%', $group);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -538,10 +538,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByResolution('fooValue');   // WHERE resolution = 'fooValue'
-     * $query->filterByResolution('%fooValue%', Criteria::LIKE); // WHERE resolution LIKE '%fooValue%'
+     * $query->filterByResolution('%fooValue%'); // WHERE resolution LIKE '%fooValue%'
      * </code>
      *
      * @param     string $resolution The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -551,6 +552,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($resolution)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $resolution)) {
+                $resolution = str_replace('*', '%', $resolution);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -563,10 +567,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByVideo('fooValue');   // WHERE video = 'fooValue'
-     * $query->filterByVideo('%fooValue%', Criteria::LIKE); // WHERE video LIKE '%fooValue%'
+     * $query->filterByVideo('%fooValue%'); // WHERE video LIKE '%fooValue%'
      * </code>
      *
      * @param     string $video The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -576,6 +581,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($video)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $video)) {
+                $video = str_replace('*', '%', $video);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -588,10 +596,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByVideoDepth('fooValue');   // WHERE video_depth = 'fooValue'
-     * $query->filterByVideoDepth('%fooValue%', Criteria::LIKE); // WHERE video_depth LIKE '%fooValue%'
+     * $query->filterByVideoDepth('%fooValue%'); // WHERE video_depth LIKE '%fooValue%'
      * </code>
      *
      * @param     string $videoDepth The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -601,6 +610,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($videoDepth)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $videoDepth)) {
+                $videoDepth = str_replace('*', '%', $videoDepth);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -613,10 +625,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByAudio('fooValue');   // WHERE audio = 'fooValue'
-     * $query->filterByAudio('%fooValue%', Criteria::LIKE); // WHERE audio LIKE '%fooValue%'
+     * $query->filterByAudio('%fooValue%'); // WHERE audio LIKE '%fooValue%'
      * </code>
      *
      * @param     string $audio The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -626,6 +639,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($audio)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $audio)) {
+                $audio = str_replace('*', '%', $audio);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -638,10 +654,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterBySource('fooValue');   // WHERE source = 'fooValue'
-     * $query->filterBySource('%fooValue%', Criteria::LIKE); // WHERE source LIKE '%fooValue%'
+     * $query->filterBySource('%fooValue%'); // WHERE source LIKE '%fooValue%'
      * </code>
      *
      * @param     string $source The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -651,6 +668,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($source)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $source)) {
+                $source = str_replace('*', '%', $source);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -663,10 +683,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByContainer('fooValue');   // WHERE container = 'fooValue'
-     * $query->filterByContainer('%fooValue%', Criteria::LIKE); // WHERE container LIKE '%fooValue%'
+     * $query->filterByContainer('%fooValue%'); // WHERE container LIKE '%fooValue%'
      * </code>
      *
      * @param     string $container The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -676,6 +697,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($container)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $container)) {
+                $container = str_replace('*', '%', $container);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -688,10 +712,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByCrc32('fooValue');   // WHERE crc32 = 'fooValue'
-     * $query->filterByCrc32('%fooValue%', Criteria::LIKE); // WHERE crc32 LIKE '%fooValue%'
+     * $query->filterByCrc32('%fooValue%'); // WHERE crc32 LIKE '%fooValue%'
      * </code>
      *
      * @param     string $crc32 The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -701,6 +726,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($crc32)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $crc32)) {
+                $crc32 = str_replace('*', '%', $crc32);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -763,10 +791,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterBySpecial('fooValue');   // WHERE special = 'fooValue'
-     * $query->filterBySpecial('%fooValue%', Criteria::LIKE); // WHERE special LIKE '%fooValue%'
+     * $query->filterBySpecial('%fooValue%'); // WHERE special LIKE '%fooValue%'
      * </code>
      *
      * @param     string $special The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -776,6 +805,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($special)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $special)) {
+                $special = str_replace('*', '%', $special);
+                $comparison = Criteria::LIKE;
             }
         }
 
@@ -829,10 +861,11 @@ abstract class TorrentMetadataQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByVolume('fooValue');   // WHERE volume = 'fooValue'
-     * $query->filterByVolume('%fooValue%', Criteria::LIKE); // WHERE volume LIKE '%fooValue%'
+     * $query->filterByVolume('%fooValue%'); // WHERE volume LIKE '%fooValue%'
      * </code>
      *
      * @param     string $volume The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentMetadataQuery The current query, for fluid interface
@@ -842,6 +875,9 @@ abstract class TorrentMetadataQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($volume)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $volume)) {
+                $volume = str_replace('*', '%', $volume);
+                $comparison = Criteria::LIKE;
             }
         }
 

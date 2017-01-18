@@ -33,10 +33,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAnimeTitleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildAnimeTitleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildAnimeTitleQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildAnimeTitleQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildAnimeTitleQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
  * @method     ChildAnimeTitle findOne(ConnectionInterface $con = null) Return the first ChildAnimeTitle matching the query
  * @method     ChildAnimeTitle findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAnimeTitle matching the query, or a new ChildAnimeTitle object populated from the query conditions when no match is found
  *
@@ -120,27 +116,21 @@ abstract class AnimeTitleQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(AnimeTitleTableMap::DATABASE_NAME);
-        }
-
-        $this->basePreSelect($con);
-
-        if (
-            $this->formatter || $this->modelAlias || $this->with || $this->select
-            || $this->selectColumns || $this->asColumns || $this->selectModifiers
-            || $this->map || $this->having || $this->joins
-        ) {
-            return $this->findPkComplex($key, $con);
-        }
-
-        if ((null !== ($obj = AnimeTitleTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = AnimeTitleTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
-
-        return $this->findPkSimple($key, $con);
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(AnimeTitleTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
     }
 
     /**
@@ -170,7 +160,7 @@ abstract class AnimeTitleQuery extends ModelCriteria
             /** @var ChildAnimeTitle $obj */
             $obj = new ChildAnimeTitle();
             $obj->hydrate($row);
-            AnimeTitleTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            AnimeTitleTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -361,10 +351,11 @@ abstract class AnimeTitleQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
+     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
      * @param     string $name The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildAnimeTitleQuery The current query, for fluid interface
@@ -374,6 +365,9 @@ abstract class AnimeTitleQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($name)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $name)) {
+                $name = str_replace('*', '%', $name);
+                $comparison = Criteria::LIKE;
             }
         }
 

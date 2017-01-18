@@ -28,8 +28,8 @@ use Propel\Runtime\Util\PropelDateTime;
  *
  *
  *
- * @package    propel.generator..Base
- */
+* @package    propel.generator..Base
+*/
 abstract class TorrentStatus implements ActiveRecordInterface
 {
     /**
@@ -66,43 +66,37 @@ abstract class TorrentStatus implements ActiveRecordInterface
 
     /**
      * The value for the torrent_id field.
-     *
      * @var        string
      */
     protected $torrent_id;
 
     /**
      * The value for the seeders field.
-     *
      * @var        string
      */
     protected $seeders;
 
     /**
      * The value for the leechers field.
-     *
      * @var        string
      */
     protected $leechers;
 
     /**
      * The value for the downloaded field.
-     *
      * @var        string
      */
     protected $downloaded;
 
     /**
      * The value for the last_updated field.
-     *
-     * @var        DateTime
+     * @var        \DateTime
      */
     protected $last_updated;
 
     /**
      * The value for the created_at field.
-     *
-     * @var        DateTime
+     * @var        \DateTime
      */
     protected $created_at;
 
@@ -333,15 +327,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         $this->clearAllReferences();
 
-        $cls = new \ReflectionClass($this);
-        $propertyNames = [];
-        $serializableProperties = array_diff($cls->getProperties(), $cls->getProperties(\ReflectionProperty::IS_STATIC));
-
-        foreach($serializableProperties as $property) {
-            $propertyNames[] = $property->getName();
-        }
-
-        return $propertyNames;
+        return array_keys(get_object_vars($this));
     }
 
     /**
@@ -400,7 +386,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
         if ($format === null) {
             return $this->last_updated;
         } else {
-            return $this->last_updated instanceof \DateTimeInterface ? $this->last_updated->format($format) : null;
+            return $this->last_updated instanceof \DateTime ? $this->last_updated->format($format) : null;
         }
     }
 
@@ -420,7 +406,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -511,7 +497,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     /**
      * Sets the value of [last_updated] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\TorrentStatus The current object (for fluent API support)
      */
@@ -519,7 +505,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->last_updated !== null || $dt !== null) {
-            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->last_updated->format("Y-m-d H:i:s.u")) {
+            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->last_updated->format("Y-m-d H:i:s")) {
                 $this->last_updated = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentStatusTableMap::COL_LAST_UPDATED] = true;
             }
@@ -531,7 +517,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\TorrentStatus The current object (for fluent API support)
      */
@@ -539,7 +525,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->created_at !== null || $dt !== null) {
-            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->created_at->format("Y-m-d H:i:s")) {
                 $this->created_at = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentStatusTableMap::COL_CREATED_AT] = true;
             }
@@ -733,32 +719,28 @@ abstract class TorrentStatus implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
-        if ($this->alreadyInSave) {
-            return 0;
-        }
-
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(TorrentStatusTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
-            $ret = $this->preSave($con);
             $isInsert = $this->isNew();
+            $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
 
                 if (!$this->isColumnModified(TorrentStatusTableMap::COL_CREATED_AT)) {
-                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setCreatedAt(time());
                 }
                 if (!$this->isColumnModified(TorrentStatusTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setLastUpdated(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
                 if ($this->isModified() && !$this->isColumnModified(TorrentStatusTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setLastUpdated(time());
                 }
             }
             if ($ret) {
@@ -882,10 +864,10 @@ abstract class TorrentStatus implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->downloaded, PDO::PARAM_INT);
                         break;
                     case '`last_updated`':
-                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case '`created_at`':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -997,12 +979,18 @@ abstract class TorrentStatus implements ActiveRecordInterface
             $keys[4] => $this->getLastUpdated(),
             $keys[5] => $this->getCreatedAt(),
         );
+
+        $utc = new \DateTimeZone('utc');
         if ($result[$keys[4]] instanceof \DateTime) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[4]];
+            $result[$keys[4]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         if ($result[$keys[5]] instanceof \DateTime) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[5]];
+            $result[$keys[5]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1422,9 +1410,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function preSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preSave')) {
-            return parent::preSave($con);
-        }
         return true;
     }
 
@@ -1434,9 +1419,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function postSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postSave')) {
-            parent::postSave($con);
-        }
+
     }
 
     /**
@@ -1446,9 +1429,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preInsert')) {
-            return parent::preInsert($con);
-        }
         return true;
     }
 
@@ -1458,9 +1438,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postInsert')) {
-            parent::postInsert($con);
-        }
+
     }
 
     /**
@@ -1470,9 +1448,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preUpdate')) {
-            return parent::preUpdate($con);
-        }
         return true;
     }
 
@@ -1482,9 +1457,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postUpdate')) {
-            parent::postUpdate($con);
-        }
+
     }
 
     /**
@@ -1494,9 +1467,6 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preDelete')) {
-            return parent::preDelete($con);
-        }
         return true;
     }
 
@@ -1506,9 +1476,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postDelete')) {
-            parent::postDelete($con);
-        }
+
     }
 
 

@@ -30,8 +30,8 @@ use Propel\Runtime\Util\PropelDateTime;
  *
  *
  *
- * @package    propel.generator..Base
- */
+* @package    propel.generator..Base
+*/
 abstract class Torrent implements ActiveRecordInterface
 {
     /**
@@ -68,42 +68,36 @@ abstract class Torrent implements ActiveRecordInterface
 
     /**
      * The value for the id field.
-     *
      * @var        string
      */
     protected $id;
 
     /**
      * The value for the info_hash field.
-     *
      * @var        string
      */
     protected $info_hash;
 
     /**
      * The value for the cached_torrent_file field.
-     *
      * @var        string
      */
     protected $cached_torrent_file;
 
     /**
      * The value for the torrent_title field.
-     *
      * @var        string
      */
     protected $torrent_title;
 
     /**
      * The value for the submitter_id field.
-     *
      * @var        string
      */
     protected $submitter_id;
 
     /**
      * The value for the trackers field.
-     *
      * @var        array
      */
     protected $trackers;
@@ -116,16 +110,20 @@ abstract class Torrent implements ActiveRecordInterface
     protected $trackers_unserialized;
 
     /**
+     * The value for the main_tracker field.
+     * @var        string
+     */
+    protected $main_tracker;
+
+    /**
      * The value for the date_crawled field.
-     *
-     * @var        DateTime
+     * @var        \DateTime
      */
     protected $date_crawled;
 
     /**
      * The value for the last_updated field.
-     *
-     * @var        DateTime
+     * @var        \DateTime
      */
     protected $last_updated;
 
@@ -361,15 +359,7 @@ abstract class Torrent implements ActiveRecordInterface
     {
         $this->clearAllReferences();
 
-        $cls = new \ReflectionClass($this);
-        $propertyNames = [];
-        $serializableProperties = array_diff($cls->getProperties(), $cls->getProperties(\ReflectionProperty::IS_STATIC));
-
-        foreach($serializableProperties as $property) {
-            $propertyNames[] = $property->getName();
-        }
-
-        return $propertyNames;
+        return array_keys(get_object_vars($this));
     }
 
     /**
@@ -434,7 +424,7 @@ abstract class Torrent implements ActiveRecordInterface
         }
         if (!$this->trackers_unserialized && null !== $this->trackers) {
             $trackers_unserialized = substr($this->trackers, 2, -2);
-            $this->trackers_unserialized = '' !== $trackers_unserialized ? explode(' | ', $trackers_unserialized) : array();
+            $this->trackers_unserialized = $trackers_unserialized ? explode(' | ', $trackers_unserialized) : array();
         }
 
         return $this->trackers_unserialized;
@@ -452,6 +442,16 @@ abstract class Torrent implements ActiveRecordInterface
     } // hasTracker()
 
     /**
+     * Get the [main_tracker] column value.
+     *
+     * @return string
+     */
+    public function getMainTracker()
+    {
+        return $this->main_tracker;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [date_crawled] column value.
      *
      *
@@ -467,7 +467,7 @@ abstract class Torrent implements ActiveRecordInterface
         if ($format === null) {
             return $this->date_crawled;
         } else {
-            return $this->date_crawled instanceof \DateTimeInterface ? $this->date_crawled->format($format) : null;
+            return $this->date_crawled instanceof \DateTime ? $this->date_crawled->format($format) : null;
         }
     }
 
@@ -487,7 +487,7 @@ abstract class Torrent implements ActiveRecordInterface
         if ($format === null) {
             return $this->last_updated;
         } else {
-            return $this->last_updated instanceof \DateTimeInterface ? $this->last_updated->format($format) : null;
+            return $this->last_updated instanceof \DateTime ? $this->last_updated->format($format) : null;
         }
     }
 
@@ -643,9 +643,29 @@ abstract class Torrent implements ActiveRecordInterface
     } // removeTracker()
 
     /**
+     * Set the value of [main_tracker] column.
+     *
+     * @param string $v new value
+     * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
+     */
+    public function setMainTracker($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->main_tracker !== $v) {
+            $this->main_tracker = $v;
+            $this->modifiedColumns[TorrentTableMap::COL_MAIN_TRACKER] = true;
+        }
+
+        return $this;
+    } // setMainTracker()
+
+    /**
      * Sets the value of [date_crawled] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
      */
@@ -653,7 +673,7 @@ abstract class Torrent implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->date_crawled !== null || $dt !== null) {
-            if ($this->date_crawled === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->date_crawled->format("Y-m-d H:i:s.u")) {
+            if ($this->date_crawled === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->date_crawled->format("Y-m-d H:i:s")) {
                 $this->date_crawled = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentTableMap::COL_DATE_CRAWLED] = true;
             }
@@ -665,7 +685,7 @@ abstract class Torrent implements ActiveRecordInterface
     /**
      * Sets the value of [last_updated] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
      */
@@ -673,7 +693,7 @@ abstract class Torrent implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->last_updated !== null || $dt !== null) {
-            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->last_updated->format("Y-m-d H:i:s.u")) {
+            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->last_updated->format("Y-m-d H:i:s")) {
                 $this->last_updated = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentTableMap::COL_LAST_UPDATED] = true;
             }
@@ -737,13 +757,16 @@ abstract class Torrent implements ActiveRecordInterface
             $this->trackers = $col;
             $this->trackers_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentTableMap::translateFieldName('DateCrawled', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentTableMap::translateFieldName('MainTracker', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->main_tracker = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentTableMap::translateFieldName('DateCrawled', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->date_crawled = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : TorrentTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -756,7 +779,7 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\Torrent'), 0, $e);
@@ -874,32 +897,28 @@ abstract class Torrent implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
-        if ($this->alreadyInSave) {
-            return 0;
-        }
-
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(TorrentTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
-            $ret = $this->preSave($con);
             $isInsert = $this->isNew();
+            $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
 
                 if (!$this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
-                    $this->setDateCrawled(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setDateCrawled(time());
                 }
                 if (!$this->isColumnModified(TorrentTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setLastUpdated(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
                 if ($this->isModified() && !$this->isColumnModified(TorrentTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setLastUpdated(time());
                 }
             }
             if ($ret) {
@@ -999,6 +1018,9 @@ abstract class Torrent implements ActiveRecordInterface
         if ($this->isColumnModified(TorrentTableMap::COL_TRACKERS)) {
             $modifiedColumns[':p' . $index++]  = '`trackers`';
         }
+        if ($this->isColumnModified(TorrentTableMap::COL_MAIN_TRACKER)) {
+            $modifiedColumns[':p' . $index++]  = '`main_tracker`';
+        }
         if ($this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
             $modifiedColumns[':p' . $index++]  = '`date_crawled`';
         }
@@ -1034,11 +1056,14 @@ abstract class Torrent implements ActiveRecordInterface
                     case '`trackers`':
                         $stmt->bindValue($identifier, $this->trackers, PDO::PARAM_STR);
                         break;
+                    case '`main_tracker`':
+                        $stmt->bindValue($identifier, $this->main_tracker, PDO::PARAM_STR);
+                        break;
                     case '`date_crawled`':
-                        $stmt->bindValue($identifier, $this->date_crawled ? $this->date_crawled->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->date_crawled ? $this->date_crawled->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case '`last_updated`':
-                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1114,9 +1139,12 @@ abstract class Torrent implements ActiveRecordInterface
                 return $this->getTrackers();
                 break;
             case 6:
-                return $this->getDateCrawled();
+                return $this->getMainTracker();
                 break;
             case 7:
+                return $this->getDateCrawled();
+                break;
+            case 8:
                 return $this->getLastUpdated();
                 break;
             default:
@@ -1155,15 +1183,22 @@ abstract class Torrent implements ActiveRecordInterface
             $keys[3] => $this->getTorrentTitle(),
             $keys[4] => $this->getSubmitterId(),
             $keys[5] => $this->getTrackers(),
-            $keys[6] => $this->getDateCrawled(),
-            $keys[7] => $this->getLastUpdated(),
+            $keys[6] => $this->getMainTracker(),
+            $keys[7] => $this->getDateCrawled(),
+            $keys[8] => $this->getLastUpdated(),
         );
-        if ($result[$keys[6]] instanceof \DateTime) {
-            $result[$keys[6]] = $result[$keys[6]]->format('c');
+
+        $utc = new \DateTimeZone('utc');
+        if ($result[$keys[7]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[7]];
+            $result[$keys[7]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
-        if ($result[$keys[7]] instanceof \DateTime) {
-            $result[$keys[7]] = $result[$keys[7]]->format('c');
+        if ($result[$keys[8]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[8]];
+            $result[$keys[8]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1259,9 +1294,12 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->setTrackers($value);
                 break;
             case 6:
-                $this->setDateCrawled($value);
+                $this->setMainTracker($value);
                 break;
             case 7:
+                $this->setDateCrawled($value);
+                break;
+            case 8:
                 $this->setLastUpdated($value);
                 break;
         } // switch()
@@ -1309,10 +1347,13 @@ abstract class Torrent implements ActiveRecordInterface
             $this->setTrackers($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setDateCrawled($arr[$keys[6]]);
+            $this->setMainTracker($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setLastUpdated($arr[$keys[7]]);
+            $this->setDateCrawled($arr[$keys[7]]);
+        }
+        if (array_key_exists($keys[8], $arr)) {
+            $this->setLastUpdated($arr[$keys[8]]);
         }
     }
 
@@ -1372,6 +1413,9 @@ abstract class Torrent implements ActiveRecordInterface
         }
         if ($this->isColumnModified(TorrentTableMap::COL_TRACKERS)) {
             $criteria->add(TorrentTableMap::COL_TRACKERS, $this->trackers);
+        }
+        if ($this->isColumnModified(TorrentTableMap::COL_MAIN_TRACKER)) {
+            $criteria->add(TorrentTableMap::COL_MAIN_TRACKER, $this->main_tracker);
         }
         if ($this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
             $criteria->add(TorrentTableMap::COL_DATE_CRAWLED, $this->date_crawled);
@@ -1471,6 +1515,7 @@ abstract class Torrent implements ActiveRecordInterface
         $copyObj->setTorrentTitle($this->getTorrentTitle());
         $copyObj->setSubmitterId($this->getSubmitterId());
         $copyObj->setTrackers($this->getTrackers());
+        $copyObj->setMainTracker($this->getMainTracker());
         $copyObj->setDateCrawled($this->getDateCrawled());
         $copyObj->setLastUpdated($this->getLastUpdated());
 
@@ -1617,6 +1662,7 @@ abstract class Torrent implements ActiveRecordInterface
         $this->submitter_id = null;
         $this->trackers = null;
         $this->trackers_unserialized = null;
+        $this->main_tracker = null;
         $this->date_crawled = null;
         $this->last_updated = null;
         $this->alreadyInSave = false;
@@ -1680,9 +1726,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function preSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preSave')) {
-            return parent::preSave($con);
-        }
         return true;
     }
 
@@ -1692,9 +1735,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function postSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postSave')) {
-            parent::postSave($con);
-        }
+
     }
 
     /**
@@ -1704,9 +1745,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preInsert')) {
-            return parent::preInsert($con);
-        }
         return true;
     }
 
@@ -1716,9 +1754,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postInsert')) {
-            parent::postInsert($con);
-        }
+
     }
 
     /**
@@ -1728,9 +1764,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preUpdate')) {
-            return parent::preUpdate($con);
-        }
         return true;
     }
 
@@ -1740,9 +1773,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postUpdate')) {
-            parent::postUpdate($con);
-        }
+
     }
 
     /**
@@ -1752,9 +1783,6 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preDelete')) {
-            return parent::preDelete($con);
-        }
         return true;
     }
 
@@ -1764,9 +1792,7 @@ abstract class Torrent implements ActiveRecordInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postDelete')) {
-            parent::postDelete($con);
-        }
+
     }
 
 

@@ -8,6 +8,7 @@
         <column name="torrent_title" type="LONGVARCHAR" />
         <column name="submitter_id" type="BIGINT" />
         <column name="trackers" type="array" />
+        <column name="main_tracker" type="varchar" size="255" />
         <column name="date_crawled" type="timestamp"/>
         <column name="last_updated" type="timestamp"/>
 
