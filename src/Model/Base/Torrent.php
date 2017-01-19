@@ -110,12 +110,6 @@ abstract class Torrent implements ActiveRecordInterface
     protected $trackers_unserialized;
 
     /**
-     * The value for the main_tracker field.
-     * @var        string
-     */
-    protected $main_tracker;
-
-    /**
      * The value for the date_crawled field.
      * @var        \DateTime
      */
@@ -442,16 +436,6 @@ abstract class Torrent implements ActiveRecordInterface
     } // hasTracker()
 
     /**
-     * Get the [main_tracker] column value.
-     *
-     * @return string
-     */
-    public function getMainTracker()
-    {
-        return $this->main_tracker;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [date_crawled] column value.
      *
      *
@@ -643,26 +627,6 @@ abstract class Torrent implements ActiveRecordInterface
     } // removeTracker()
 
     /**
-     * Set the value of [main_tracker] column.
-     *
-     * @param string $v new value
-     * @return $this|\Odango\Hebi\Model\Torrent The current object (for fluent API support)
-     */
-    public function setMainTracker($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->main_tracker !== $v) {
-            $this->main_tracker = $v;
-            $this->modifiedColumns[TorrentTableMap::COL_MAIN_TRACKER] = true;
-        }
-
-        return $this;
-    } // setMainTracker()
-
-    /**
      * Sets the value of [date_crawled] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTime value.
@@ -757,16 +721,13 @@ abstract class Torrent implements ActiveRecordInterface
             $this->trackers = $col;
             $this->trackers_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentTableMap::translateFieldName('MainTracker', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->main_tracker = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentTableMap::translateFieldName('DateCrawled', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TorrentTableMap::translateFieldName('DateCrawled', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->date_crawled = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : TorrentTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : TorrentTableMap::translateFieldName('LastUpdated', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -779,7 +740,7 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = TorrentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Odango\\Hebi\\Model\\Torrent'), 0, $e);
@@ -1018,9 +979,6 @@ abstract class Torrent implements ActiveRecordInterface
         if ($this->isColumnModified(TorrentTableMap::COL_TRACKERS)) {
             $modifiedColumns[':p' . $index++]  = '`trackers`';
         }
-        if ($this->isColumnModified(TorrentTableMap::COL_MAIN_TRACKER)) {
-            $modifiedColumns[':p' . $index++]  = '`main_tracker`';
-        }
         if ($this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
             $modifiedColumns[':p' . $index++]  = '`date_crawled`';
         }
@@ -1055,9 +1013,6 @@ abstract class Torrent implements ActiveRecordInterface
                         break;
                     case '`trackers`':
                         $stmt->bindValue($identifier, $this->trackers, PDO::PARAM_STR);
-                        break;
-                    case '`main_tracker`':
-                        $stmt->bindValue($identifier, $this->main_tracker, PDO::PARAM_STR);
                         break;
                     case '`date_crawled`':
                         $stmt->bindValue($identifier, $this->date_crawled ? $this->date_crawled->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1139,12 +1094,9 @@ abstract class Torrent implements ActiveRecordInterface
                 return $this->getTrackers();
                 break;
             case 6:
-                return $this->getMainTracker();
-                break;
-            case 7:
                 return $this->getDateCrawled();
                 break;
-            case 8:
+            case 7:
                 return $this->getLastUpdated();
                 break;
             default:
@@ -1183,22 +1135,21 @@ abstract class Torrent implements ActiveRecordInterface
             $keys[3] => $this->getTorrentTitle(),
             $keys[4] => $this->getSubmitterId(),
             $keys[5] => $this->getTrackers(),
-            $keys[6] => $this->getMainTracker(),
-            $keys[7] => $this->getDateCrawled(),
-            $keys[8] => $this->getLastUpdated(),
+            $keys[6] => $this->getDateCrawled(),
+            $keys[7] => $this->getLastUpdated(),
         );
 
         $utc = new \DateTimeZone('utc');
+        if ($result[$keys[6]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[6]];
+            $result[$keys[6]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+
         if ($result[$keys[7]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
             $dateTime = clone $result[$keys[7]];
             $result[$keys[7]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
-        }
-
-        if ($result[$keys[8]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[8]];
-            $result[$keys[8]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1294,12 +1245,9 @@ abstract class Torrent implements ActiveRecordInterface
                 $this->setTrackers($value);
                 break;
             case 6:
-                $this->setMainTracker($value);
-                break;
-            case 7:
                 $this->setDateCrawled($value);
                 break;
-            case 8:
+            case 7:
                 $this->setLastUpdated($value);
                 break;
         } // switch()
@@ -1347,13 +1295,10 @@ abstract class Torrent implements ActiveRecordInterface
             $this->setTrackers($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setMainTracker($arr[$keys[6]]);
+            $this->setDateCrawled($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setDateCrawled($arr[$keys[7]]);
-        }
-        if (array_key_exists($keys[8], $arr)) {
-            $this->setLastUpdated($arr[$keys[8]]);
+            $this->setLastUpdated($arr[$keys[7]]);
         }
     }
 
@@ -1413,9 +1358,6 @@ abstract class Torrent implements ActiveRecordInterface
         }
         if ($this->isColumnModified(TorrentTableMap::COL_TRACKERS)) {
             $criteria->add(TorrentTableMap::COL_TRACKERS, $this->trackers);
-        }
-        if ($this->isColumnModified(TorrentTableMap::COL_MAIN_TRACKER)) {
-            $criteria->add(TorrentTableMap::COL_MAIN_TRACKER, $this->main_tracker);
         }
         if ($this->isColumnModified(TorrentTableMap::COL_DATE_CRAWLED)) {
             $criteria->add(TorrentTableMap::COL_DATE_CRAWLED, $this->date_crawled);
@@ -1515,7 +1457,6 @@ abstract class Torrent implements ActiveRecordInterface
         $copyObj->setTorrentTitle($this->getTorrentTitle());
         $copyObj->setSubmitterId($this->getSubmitterId());
         $copyObj->setTrackers($this->getTrackers());
-        $copyObj->setMainTracker($this->getMainTracker());
         $copyObj->setDateCrawled($this->getDateCrawled());
         $copyObj->setLastUpdated($this->getLastUpdated());
 
@@ -1662,7 +1603,6 @@ abstract class Torrent implements ActiveRecordInterface
         $this->submitter_id = null;
         $this->trackers = null;
         $this->trackers_unserialized = null;
-        $this->main_tracker = null;
         $this->date_crawled = null;
         $this->last_updated = null;
         $this->alreadyInSave = false;

@@ -26,7 +26,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery orderByTorrentTitle($order = Criteria::ASC) Order by the torrent_title column
  * @method     ChildTorrentQuery orderBySubmitterId($order = Criteria::ASC) Order by the submitter_id column
  * @method     ChildTorrentQuery orderByTrackers($order = Criteria::ASC) Order by the trackers column
- * @method     ChildTorrentQuery orderByMainTracker($order = Criteria::ASC) Order by the main_tracker column
  * @method     ChildTorrentQuery orderByDateCrawled($order = Criteria::ASC) Order by the date_crawled column
  * @method     ChildTorrentQuery orderByLastUpdated($order = Criteria::ASC) Order by the last_updated column
  *
@@ -36,7 +35,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery groupByTorrentTitle() Group by the torrent_title column
  * @method     ChildTorrentQuery groupBySubmitterId() Group by the submitter_id column
  * @method     ChildTorrentQuery groupByTrackers() Group by the trackers column
- * @method     ChildTorrentQuery groupByMainTracker() Group by the main_tracker column
  * @method     ChildTorrentQuery groupByDateCrawled() Group by the date_crawled column
  * @method     ChildTorrentQuery groupByLastUpdated() Group by the last_updated column
  *
@@ -63,7 +61,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent findOneByTorrentTitle(string $torrent_title) Return the first ChildTorrent filtered by the torrent_title column
  * @method     ChildTorrent findOneBySubmitterId(string $submitter_id) Return the first ChildTorrent filtered by the submitter_id column
  * @method     ChildTorrent findOneByTrackers(array $trackers) Return the first ChildTorrent filtered by the trackers column
- * @method     ChildTorrent findOneByMainTracker(string $main_tracker) Return the first ChildTorrent filtered by the main_tracker column
  * @method     ChildTorrent findOneByDateCrawled(string $date_crawled) Return the first ChildTorrent filtered by the date_crawled column
  * @method     ChildTorrent findOneByLastUpdated(string $last_updated) Return the first ChildTorrent filtered by the last_updated column *
 
@@ -76,7 +73,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent requireOneByTorrentTitle(string $torrent_title) Return the first ChildTorrent filtered by the torrent_title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneBySubmitterId(string $submitter_id) Return the first ChildTorrent filtered by the submitter_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneByTrackers(array $trackers) Return the first ChildTorrent filtered by the trackers column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTorrent requireOneByMainTracker(string $main_tracker) Return the first ChildTorrent filtered by the main_tracker column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneByDateCrawled(string $date_crawled) Return the first ChildTorrent filtered by the date_crawled column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrent requireOneByLastUpdated(string $last_updated) Return the first ChildTorrent filtered by the last_updated column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -87,7 +83,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrent[]|ObjectCollection findByTorrentTitle(string $torrent_title) Return ChildTorrent objects filtered by the torrent_title column
  * @method     ChildTorrent[]|ObjectCollection findBySubmitterId(string $submitter_id) Return ChildTorrent objects filtered by the submitter_id column
  * @method     ChildTorrent[]|ObjectCollection findByTrackers(array $trackers) Return ChildTorrent objects filtered by the trackers column
- * @method     ChildTorrent[]|ObjectCollection findByMainTracker(string $main_tracker) Return ChildTorrent objects filtered by the main_tracker column
  * @method     ChildTorrent[]|ObjectCollection findByDateCrawled(string $date_crawled) Return ChildTorrent objects filtered by the date_crawled column
  * @method     ChildTorrent[]|ObjectCollection findByLastUpdated(string $last_updated) Return ChildTorrent objects filtered by the last_updated column
  * @method     ChildTorrent[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -182,7 +177,7 @@ abstract class TorrentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `id`, `info_hash`, `cached_torrent_file`, `torrent_title`, `submitter_id`, `trackers`, `main_tracker`, `date_crawled`, `last_updated` FROM `torrent` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `info_hash`, `cached_torrent_file`, `torrent_title`, `submitter_id`, `trackers`, `date_crawled`, `last_updated` FROM `torrent` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -520,35 +515,6 @@ abstract class TorrentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TorrentTableMap::COL_TRACKERS, $trackers, $comparison);
-    }
-
-    /**
-     * Filter the query on the main_tracker column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByMainTracker('fooValue');   // WHERE main_tracker = 'fooValue'
-     * $query->filterByMainTracker('%fooValue%'); // WHERE main_tracker LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $mainTracker The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTorrentQuery The current query, for fluid interface
-     */
-    public function filterByMainTracker($mainTracker = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($mainTracker)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $mainTracker)) {
-                $mainTracker = str_replace('*', '%', $mainTracker);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(TorrentTableMap::COL_MAIN_TRACKER, $mainTracker, $comparison);
     }
 
     /**

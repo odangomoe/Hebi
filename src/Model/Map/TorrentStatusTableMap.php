@@ -59,7 +59,7 @@ class TorrentStatusTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,22 @@ class TorrentStatusTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the torrent_id field
      */
     const COL_TORRENT_ID = 'torrent_status.torrent_id';
+
+    /**
+     * the column name for the success field
+     */
+    const COL_SUCCESS = 'torrent_status.success';
+
+    /**
+     * the column name for the tracker field
+     */
+    const COL_TRACKER = 'torrent_status.tracker';
 
     /**
      * the column name for the seeders field
@@ -113,11 +123,11 @@ class TorrentStatusTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('TorrentId', 'Seeders', 'Leechers', 'Downloaded', 'LastUpdated', 'CreatedAt', ),
-        self::TYPE_CAMELNAME     => array('torrentId', 'seeders', 'leechers', 'downloaded', 'lastUpdated', 'createdAt', ),
-        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID, TorrentStatusTableMap::COL_SEEDERS, TorrentStatusTableMap::COL_LEECHERS, TorrentStatusTableMap::COL_DOWNLOADED, TorrentStatusTableMap::COL_LAST_UPDATED, TorrentStatusTableMap::COL_CREATED_AT, ),
-        self::TYPE_FIELDNAME     => array('torrent_id', 'seeders', 'leechers', 'downloaded', 'last_updated', 'created_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('TorrentId', 'Success', 'Tracker', 'Seeders', 'Leechers', 'Downloaded', 'LastUpdated', 'CreatedAt', ),
+        self::TYPE_CAMELNAME     => array('torrentId', 'success', 'tracker', 'seeders', 'leechers', 'downloaded', 'lastUpdated', 'createdAt', ),
+        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID, TorrentStatusTableMap::COL_SUCCESS, TorrentStatusTableMap::COL_TRACKER, TorrentStatusTableMap::COL_SEEDERS, TorrentStatusTableMap::COL_LEECHERS, TorrentStatusTableMap::COL_DOWNLOADED, TorrentStatusTableMap::COL_LAST_UPDATED, TorrentStatusTableMap::COL_CREATED_AT, ),
+        self::TYPE_FIELDNAME     => array('torrent_id', 'success', 'tracker', 'seeders', 'leechers', 'downloaded', 'last_updated', 'created_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -127,11 +137,11 @@ class TorrentStatusTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('TorrentId' => 0, 'Seeders' => 1, 'Leechers' => 2, 'Downloaded' => 3, 'LastUpdated' => 4, 'CreatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('torrentId' => 0, 'seeders' => 1, 'leechers' => 2, 'downloaded' => 3, 'lastUpdated' => 4, 'createdAt' => 5, ),
-        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID => 0, TorrentStatusTableMap::COL_SEEDERS => 1, TorrentStatusTableMap::COL_LEECHERS => 2, TorrentStatusTableMap::COL_DOWNLOADED => 3, TorrentStatusTableMap::COL_LAST_UPDATED => 4, TorrentStatusTableMap::COL_CREATED_AT => 5, ),
-        self::TYPE_FIELDNAME     => array('torrent_id' => 0, 'seeders' => 1, 'leechers' => 2, 'downloaded' => 3, 'last_updated' => 4, 'created_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('TorrentId' => 0, 'Success' => 1, 'Tracker' => 2, 'Seeders' => 3, 'Leechers' => 4, 'Downloaded' => 5, 'LastUpdated' => 6, 'CreatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('torrentId' => 0, 'success' => 1, 'tracker' => 2, 'seeders' => 3, 'leechers' => 4, 'downloaded' => 5, 'lastUpdated' => 6, 'createdAt' => 7, ),
+        self::TYPE_COLNAME       => array(TorrentStatusTableMap::COL_TORRENT_ID => 0, TorrentStatusTableMap::COL_SUCCESS => 1, TorrentStatusTableMap::COL_TRACKER => 2, TorrentStatusTableMap::COL_SEEDERS => 3, TorrentStatusTableMap::COL_LEECHERS => 4, TorrentStatusTableMap::COL_DOWNLOADED => 5, TorrentStatusTableMap::COL_LAST_UPDATED => 6, TorrentStatusTableMap::COL_CREATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('torrent_id' => 0, 'success' => 1, 'tracker' => 2, 'seeders' => 3, 'leechers' => 4, 'downloaded' => 5, 'last_updated' => 6, 'created_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -152,6 +162,8 @@ class TorrentStatusTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('torrent_id', 'TorrentId', 'BIGINT' , 'torrent', 'id', true, null, null);
+        $this->addColumn('success', 'Success', 'BOOLEAN', false, 1, true);
+        $this->addColumn('tracker', 'Tracker', 'VARCHAR', false, 255, null);
         $this->addColumn('seeders', 'Seeders', 'BIGINT', false, null, null);
         $this->addColumn('leechers', 'Leechers', 'BIGINT', false, null, null);
         $this->addColumn('downloaded', 'Downloaded', 'BIGINT', false, null, null);
@@ -328,6 +340,8 @@ class TorrentStatusTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_TORRENT_ID);
+            $criteria->addSelectColumn(TorrentStatusTableMap::COL_SUCCESS);
+            $criteria->addSelectColumn(TorrentStatusTableMap::COL_TRACKER);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_SEEDERS);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_LEECHERS);
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_DOWNLOADED);
@@ -335,6 +349,8 @@ class TorrentStatusTableMap extends TableMap
             $criteria->addSelectColumn(TorrentStatusTableMap::COL_CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.torrent_id');
+            $criteria->addSelectColumn($alias . '.success');
+            $criteria->addSelectColumn($alias . '.tracker');
             $criteria->addSelectColumn($alias . '.seeders');
             $criteria->addSelectColumn($alias . '.leechers');
             $criteria->addSelectColumn($alias . '.downloaded');

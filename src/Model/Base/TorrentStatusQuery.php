@@ -21,6 +21,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildTorrentStatusQuery orderByTorrentId($order = Criteria::ASC) Order by the torrent_id column
+ * @method     ChildTorrentStatusQuery orderBySuccess($order = Criteria::ASC) Order by the success column
+ * @method     ChildTorrentStatusQuery orderByTracker($order = Criteria::ASC) Order by the tracker column
  * @method     ChildTorrentStatusQuery orderBySeeders($order = Criteria::ASC) Order by the seeders column
  * @method     ChildTorrentStatusQuery orderByLeechers($order = Criteria::ASC) Order by the leechers column
  * @method     ChildTorrentStatusQuery orderByDownloaded($order = Criteria::ASC) Order by the downloaded column
@@ -28,6 +30,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatusQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method     ChildTorrentStatusQuery groupByTorrentId() Group by the torrent_id column
+ * @method     ChildTorrentStatusQuery groupBySuccess() Group by the success column
+ * @method     ChildTorrentStatusQuery groupByTracker() Group by the tracker column
  * @method     ChildTorrentStatusQuery groupBySeeders() Group by the seeders column
  * @method     ChildTorrentStatusQuery groupByLeechers() Group by the leechers column
  * @method     ChildTorrentStatusQuery groupByDownloaded() Group by the downloaded column
@@ -48,6 +52,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatus findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTorrentStatus matching the query, or a new ChildTorrentStatus object populated from the query conditions when no match is found
  *
  * @method     ChildTorrentStatus findOneByTorrentId(string $torrent_id) Return the first ChildTorrentStatus filtered by the torrent_id column
+ * @method     ChildTorrentStatus findOneBySuccess(boolean $success) Return the first ChildTorrentStatus filtered by the success column
+ * @method     ChildTorrentStatus findOneByTracker(string $tracker) Return the first ChildTorrentStatus filtered by the tracker column
  * @method     ChildTorrentStatus findOneBySeeders(string $seeders) Return the first ChildTorrentStatus filtered by the seeders column
  * @method     ChildTorrentStatus findOneByLeechers(string $leechers) Return the first ChildTorrentStatus filtered by the leechers column
  * @method     ChildTorrentStatus findOneByDownloaded(string $downloaded) Return the first ChildTorrentStatus filtered by the downloaded column
@@ -58,6 +64,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatus requireOne(ConnectionInterface $con = null) Return the first ChildTorrentStatus matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTorrentStatus requireOneByTorrentId(string $torrent_id) Return the first ChildTorrentStatus filtered by the torrent_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentStatus requireOneBySuccess(boolean $success) Return the first ChildTorrentStatus filtered by the success column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTorrentStatus requireOneByTracker(string $tracker) Return the first ChildTorrentStatus filtered by the tracker column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneBySeeders(string $seeders) Return the first ChildTorrentStatus filtered by the seeders column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneByLeechers(string $leechers) Return the first ChildTorrentStatus filtered by the leechers column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTorrentStatus requireOneByDownloaded(string $downloaded) Return the first ChildTorrentStatus filtered by the downloaded column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -66,6 +74,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildTorrentStatus[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTorrentStatus objects based on current ModelCriteria
  * @method     ChildTorrentStatus[]|ObjectCollection findByTorrentId(string $torrent_id) Return ChildTorrentStatus objects filtered by the torrent_id column
+ * @method     ChildTorrentStatus[]|ObjectCollection findBySuccess(boolean $success) Return ChildTorrentStatus objects filtered by the success column
+ * @method     ChildTorrentStatus[]|ObjectCollection findByTracker(string $tracker) Return ChildTorrentStatus objects filtered by the tracker column
  * @method     ChildTorrentStatus[]|ObjectCollection findBySeeders(string $seeders) Return ChildTorrentStatus objects filtered by the seeders column
  * @method     ChildTorrentStatus[]|ObjectCollection findByLeechers(string $leechers) Return ChildTorrentStatus objects filtered by the leechers column
  * @method     ChildTorrentStatus[]|ObjectCollection findByDownloaded(string $downloaded) Return ChildTorrentStatus objects filtered by the downloaded column
@@ -163,7 +173,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `torrent_id`, `seeders`, `leechers`, `downloaded`, `last_updated`, `created_at` FROM `torrent_status` WHERE `torrent_id` = :p0';
+        $sql = 'SELECT `torrent_id`, `success`, `tracker`, `seeders`, `leechers`, `downloaded`, `last_updated`, `created_at` FROM `torrent_status` WHERE `torrent_id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -294,6 +304,62 @@ abstract class TorrentStatusQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TorrentStatusTableMap::COL_TORRENT_ID, $torrentId, $comparison);
+    }
+
+    /**
+     * Filter the query on the success column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySuccess(true); // WHERE success = true
+     * $query->filterBySuccess('yes'); // WHERE success = true
+     * </code>
+     *
+     * @param     boolean|string $success The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTorrentStatusQuery The current query, for fluid interface
+     */
+    public function filterBySuccess($success = null, $comparison = null)
+    {
+        if (is_string($success)) {
+            $success = in_array(strtolower($success), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(TorrentStatusTableMap::COL_SUCCESS, $success, $comparison);
+    }
+
+    /**
+     * Filter the query on the tracker column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTracker('fooValue');   // WHERE tracker = 'fooValue'
+     * $query->filterByTracker('%fooValue%'); // WHERE tracker LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $tracker The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTorrentStatusQuery The current query, for fluid interface
+     */
+    public function filterByTracker($tracker = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($tracker)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $tracker)) {
+                $tracker = str_replace('*', '%', $tracker);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TorrentStatusTableMap::COL_TRACKER, $tracker, $comparison);
     }
 
     /**
