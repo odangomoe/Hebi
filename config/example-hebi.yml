@@ -1,0 +1,10 @@
+hebi:
+  log: storage/hebi.log
+  anidb:
+    dump-url: 'http://anidb.net/api/anime-titles.xml.gz'
+  nyaa:
+    category:
+      - '1_37'
+    page-path: '/remote/nyaa-mirror/pages/%d.html'
+    torrent-path: '/remote/nyaa-mirror/torrents/%d.torrent'
+    status-file: '/remote/nyaa-mirror/status.json'
