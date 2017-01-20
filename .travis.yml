@@ -5,6 +5,7 @@ php:
 install:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev --no-interaction
+  - cp config/example-hebi.yml config/hebi.yml
 script:
   - mkdir -p build/logs
   - php vendor/bin/phpunit -c phpunit.xml
