@@ -32,7 +32,7 @@ class AnimeTitle extends BaseAnimeTitle
         } else {
             $title->setMain($type->nodeValue === 'main');
         }
-        $title->setName($node->textContent);
+        $title->setName(trim($node->textContent));
 
         return $title;
     }
