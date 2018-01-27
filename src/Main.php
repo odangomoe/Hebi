@@ -10,6 +10,7 @@ use Monolog\Logger;
 use Odango\Hebi\AniDB\Importer;
 use Odango\Hebi\Atama\Updater;
 use Odango\Hebi\Nyaa\Iterator;
+use Odango\Hebi\NyaaSi\Crawler;
 use Pimple\Container;
 use Propel\Runtime\Propel;
 use Symfony\Component\Yaml\Yaml;
@@ -92,9 +93,15 @@ class Main
             case 'atama':
                 $updater = new Updater($this->container);
                 $updater->run();
+                break;
             case 'nyaa-backup':
                 $importer = new \Odango\Hebi\NyaaBackup\Importer($this->container);
                 $importer->run();
+                break;
+            case 'nyaasi':
+                $crawler = new Crawler($this->container);
+                $crawler->run();
+                break;
             default:
                 echo "Action '{$action}' doesn't exist\n";
                 exit(1);
