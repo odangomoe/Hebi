@@ -42,9 +42,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentStatusQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildTorrentStatusQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method     ChildTorrentStatusQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildTorrentStatusQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildTorrentStatusQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ *
  * @method     ChildTorrentStatusQuery leftJoinTorrent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Torrent relation
  * @method     ChildTorrentStatusQuery rightJoinTorrent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Torrent relation
  * @method     ChildTorrentStatusQuery innerJoinTorrent($relationAlias = null) Adds a INNER JOIN clause to the query using the Torrent relation
+ *
+ * @method     ChildTorrentStatusQuery joinWithTorrent($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Torrent relation
+ *
+ * @method     ChildTorrentStatusQuery leftJoinWithTorrent() Adds a LEFT JOIN clause and with to the query using the Torrent relation
+ * @method     ChildTorrentStatusQuery rightJoinWithTorrent() Adds a RIGHT JOIN clause and with to the query using the Torrent relation
+ * @method     ChildTorrentStatusQuery innerJoinWithTorrent() Adds a INNER JOIN clause and with to the query using the Torrent relation
  *
  * @method     \Odango\Hebi\Model\TorrentQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
@@ -143,21 +153,27 @@ abstract class TorrentStatusQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = TorrentStatusTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is already in the instance pool
-            return $obj;
-        }
+
         if ($con === null) {
             $con = Propel::getServiceContainer()->getReadConnection(TorrentStatusTableMap::DATABASE_NAME);
         }
+
         $this->basePreSelect($con);
-        if ($this->formatter || $this->modelAlias || $this->with || $this->select
-         || $this->selectColumns || $this->asColumns || $this->selectModifiers
-         || $this->map || $this->having || $this->joins) {
+
+        if (
+            $this->formatter || $this->modelAlias || $this->with || $this->select
+            || $this->selectColumns || $this->asColumns || $this->selectModifiers
+            || $this->map || $this->having || $this->joins
+        ) {
             return $this->findPkComplex($key, $con);
-        } else {
-            return $this->findPkSimple($key, $con);
         }
+
+        if ((null !== ($obj = TorrentStatusTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+            // the object is already in the instance pool
+            return $obj;
+        }
+
+        return $this->findPkSimple($key, $con);
     }
 
     /**
@@ -187,7 +203,7 @@ abstract class TorrentStatusQuery extends ModelCriteria
             /** @var ChildTorrentStatus $obj */
             $obj = new ChildTorrentStatus();
             $obj->hydrate($row);
-            TorrentStatusTableMap::addInstanceToPool($obj, (string) $key);
+            TorrentStatusTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -339,11 +355,10 @@ abstract class TorrentStatusQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByTracker('fooValue');   // WHERE tracker = 'fooValue'
-     * $query->filterByTracker('%fooValue%'); // WHERE tracker LIKE '%fooValue%'
+     * $query->filterByTracker('%fooValue%', Criteria::LIKE); // WHERE tracker LIKE '%fooValue%'
      * </code>
      *
      * @param     string $tracker The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentStatusQuery The current query, for fluid interface
@@ -353,9 +368,6 @@ abstract class TorrentStatusQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($tracker)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $tracker)) {
-                $tracker = str_replace('*', '%', $tracker);
-                $comparison = Criteria::LIKE;
             }
         }
 

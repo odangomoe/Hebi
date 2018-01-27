@@ -42,13 +42,29 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTorrentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildTorrentQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method     ChildTorrentQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildTorrentQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildTorrentQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ *
  * @method     ChildTorrentQuery leftJoinTorrentStatus($relationAlias = null) Adds a LEFT JOIN clause to the query using the TorrentStatus relation
  * @method     ChildTorrentQuery rightJoinTorrentStatus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TorrentStatus relation
  * @method     ChildTorrentQuery innerJoinTorrentStatus($relationAlias = null) Adds a INNER JOIN clause to the query using the TorrentStatus relation
  *
+ * @method     ChildTorrentQuery joinWithTorrentStatus($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TorrentStatus relation
+ *
+ * @method     ChildTorrentQuery leftJoinWithTorrentStatus() Adds a LEFT JOIN clause and with to the query using the TorrentStatus relation
+ * @method     ChildTorrentQuery rightJoinWithTorrentStatus() Adds a RIGHT JOIN clause and with to the query using the TorrentStatus relation
+ * @method     ChildTorrentQuery innerJoinWithTorrentStatus() Adds a INNER JOIN clause and with to the query using the TorrentStatus relation
+ *
  * @method     ChildTorrentQuery leftJoinTorrentMetadata($relationAlias = null) Adds a LEFT JOIN clause to the query using the TorrentMetadata relation
  * @method     ChildTorrentQuery rightJoinTorrentMetadata($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TorrentMetadata relation
  * @method     ChildTorrentQuery innerJoinTorrentMetadata($relationAlias = null) Adds a INNER JOIN clause to the query using the TorrentMetadata relation
+ *
+ * @method     ChildTorrentQuery joinWithTorrentMetadata($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TorrentMetadata relation
+ *
+ * @method     ChildTorrentQuery leftJoinWithTorrentMetadata() Adds a LEFT JOIN clause and with to the query using the TorrentMetadata relation
+ * @method     ChildTorrentQuery rightJoinWithTorrentMetadata() Adds a RIGHT JOIN clause and with to the query using the TorrentMetadata relation
+ * @method     ChildTorrentQuery innerJoinWithTorrentMetadata() Adds a INNER JOIN clause and with to the query using the TorrentMetadata relation
  *
  * @method     \Odango\Hebi\Model\TorrentStatusQuery|\Odango\Hebi\Model\TorrentMetadataQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
@@ -147,21 +163,27 @@ abstract class TorrentQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = TorrentTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is already in the instance pool
-            return $obj;
-        }
+
         if ($con === null) {
             $con = Propel::getServiceContainer()->getReadConnection(TorrentTableMap::DATABASE_NAME);
         }
+
         $this->basePreSelect($con);
-        if ($this->formatter || $this->modelAlias || $this->with || $this->select
-         || $this->selectColumns || $this->asColumns || $this->selectModifiers
-         || $this->map || $this->having || $this->joins) {
+
+        if (
+            $this->formatter || $this->modelAlias || $this->with || $this->select
+            || $this->selectColumns || $this->asColumns || $this->selectModifiers
+            || $this->map || $this->having || $this->joins
+        ) {
             return $this->findPkComplex($key, $con);
-        } else {
-            return $this->findPkSimple($key, $con);
         }
+
+        if ((null !== ($obj = TorrentTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+            // the object is already in the instance pool
+            return $obj;
+        }
+
+        return $this->findPkSimple($key, $con);
     }
 
     /**
@@ -191,7 +213,7 @@ abstract class TorrentQuery extends ModelCriteria
             /** @var ChildTorrent $obj */
             $obj = new ChildTorrent();
             $obj->hydrate($row);
-            TorrentTableMap::addInstanceToPool($obj, (string) $key);
+            TorrentTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -314,11 +336,10 @@ abstract class TorrentQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByInfoHash('fooValue');   // WHERE info_hash = 'fooValue'
-     * $query->filterByInfoHash('%fooValue%'); // WHERE info_hash LIKE '%fooValue%'
+     * $query->filterByInfoHash('%fooValue%', Criteria::LIKE); // WHERE info_hash LIKE '%fooValue%'
      * </code>
      *
      * @param     string $infoHash The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentQuery The current query, for fluid interface
@@ -328,9 +349,6 @@ abstract class TorrentQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($infoHash)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $infoHash)) {
-                $infoHash = str_replace('*', '%', $infoHash);
-                $comparison = Criteria::LIKE;
             }
         }
 
@@ -343,11 +361,10 @@ abstract class TorrentQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByCachedTorrentFile('fooValue');   // WHERE cached_torrent_file = 'fooValue'
-     * $query->filterByCachedTorrentFile('%fooValue%'); // WHERE cached_torrent_file LIKE '%fooValue%'
+     * $query->filterByCachedTorrentFile('%fooValue%', Criteria::LIKE); // WHERE cached_torrent_file LIKE '%fooValue%'
      * </code>
      *
      * @param     string $cachedTorrentFile The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentQuery The current query, for fluid interface
@@ -357,9 +374,6 @@ abstract class TorrentQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($cachedTorrentFile)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $cachedTorrentFile)) {
-                $cachedTorrentFile = str_replace('*', '%', $cachedTorrentFile);
-                $comparison = Criteria::LIKE;
             }
         }
 
@@ -372,11 +386,10 @@ abstract class TorrentQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByTorrentTitle('fooValue');   // WHERE torrent_title = 'fooValue'
-     * $query->filterByTorrentTitle('%fooValue%'); // WHERE torrent_title LIKE '%fooValue%'
+     * $query->filterByTorrentTitle('%fooValue%', Criteria::LIKE); // WHERE torrent_title LIKE '%fooValue%'
      * </code>
      *
      * @param     string $torrentTitle The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildTorrentQuery The current query, for fluid interface
@@ -386,9 +399,6 @@ abstract class TorrentQuery extends ModelCriteria
         if (null === $comparison) {
             if (is_array($torrentTitle)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $torrentTitle)) {
-                $torrentTitle = str_replace('*', '%', $torrentTitle);
-                $comparison = Criteria::LIKE;
             }
         }
 

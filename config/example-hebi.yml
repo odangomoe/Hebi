@@ -8,3 +8,5 @@ hebi:
     page-path: '/remote/nyaa-mirror/pages/%d.html'
     torrent-path: '/remote/nyaa-mirror/torrents/%d.torrent'
     status-file: '/remote/nyaa-mirror/status.json'
+  nyaa-backup:
+    dsn: 'pgsql:dbname=nyaa;user=nyaa'

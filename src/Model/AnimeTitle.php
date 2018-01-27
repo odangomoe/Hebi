@@ -25,11 +25,12 @@ class AnimeTitle extends BaseAnimeTitle
     static public function createFromNode(\DOMNode $node, $animeId): AnimeTitle {
         $title = new AnimeTitle();
         $title->setAnimeId($animeId);
+        /** @var \DOMNode|null $type */
         $type = $node->attributes->getNamedItem('type');
         if ($type === null) {
             $title->setMain(false);
         } else {
-            $title->setMain($type->value === 'main');
+            $title->setMain($type->nodeValue === 'main');
         }
         $title->setName($node->textContent);
 

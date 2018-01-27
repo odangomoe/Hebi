@@ -21,9 +21,11 @@ class Importer
         $this->config = $container['config']['anidb'] ?? [];
     }
 
-    public function run() {
+    public function run($path = null) {
         $this->boot();
-        $path = $this->download();
+        if ($path === null) {
+            $path = $this->download();
+        }
         $this->clear();
         $this->import($path);
         $this->finish();

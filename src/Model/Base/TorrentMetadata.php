@@ -28,8 +28,8 @@ use Propel\Runtime\Util\PropelDateTime;
  *
  *
  *
-* @package    propel.generator..Base
-*/
+ * @package    propel.generator..Base
+ */
 abstract class TorrentMetadata implements ActiveRecordInterface
 {
     /**
@@ -66,36 +66,42 @@ abstract class TorrentMetadata implements ActiveRecordInterface
 
     /**
      * The value for the torrent_id field.
+     *
      * @var        string
      */
     protected $torrent_id;
 
     /**
      * The value for the name field.
+     *
      * @var        string
      */
     protected $name;
 
     /**
      * The value for the type field.
+     *
      * @var        string
      */
     protected $type;
 
     /**
      * The value for the version field.
+     *
      * @var        string
      */
     protected $version;
 
     /**
      * The value for the group field.
+     *
      * @var        string
      */
     protected $group;
 
     /**
      * The value for the unparsed field.
+     *
      * @var        array
      */
     protected $unparsed;
@@ -109,48 +115,56 @@ abstract class TorrentMetadata implements ActiveRecordInterface
 
     /**
      * The value for the resolution field.
+     *
      * @var        string
      */
     protected $resolution;
 
     /**
      * The value for the video field.
+     *
      * @var        string
      */
     protected $video;
 
     /**
      * The value for the video_depth field.
+     *
      * @var        string
      */
     protected $video_depth;
 
     /**
      * The value for the audio field.
+     *
      * @var        string
      */
     protected $audio;
 
     /**
      * The value for the source field.
+     *
      * @var        string
      */
     protected $source;
 
     /**
      * The value for the container field.
+     *
      * @var        string
      */
     protected $container;
 
     /**
      * The value for the crc32 field.
+     *
      * @var        string
      */
     protected $crc32;
 
     /**
      * The value for the ep field.
+     *
      * @var        array
      */
     protected $ep;
@@ -164,24 +178,28 @@ abstract class TorrentMetadata implements ActiveRecordInterface
 
     /**
      * The value for the special field.
+     *
      * @var        string
      */
     protected $special;
 
     /**
      * The value for the season field.
+     *
      * @var        string
      */
     protected $season;
 
     /**
      * The value for the volume field.
+     *
      * @var        string
      */
     protected $volume;
 
     /**
      * The value for the collection field.
+     *
      * @var        array
      */
     protected $collection;
@@ -195,13 +213,15 @@ abstract class TorrentMetadata implements ActiveRecordInterface
 
     /**
      * The value for the date_created field.
-     * @var        \DateTime
+     *
+     * @var        DateTime
      */
     protected $date_created;
 
     /**
      * The value for the last_updated field.
-     * @var        \DateTime
+     *
+     * @var        DateTime
      */
     protected $last_updated;
 
@@ -432,7 +452,15 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     {
         $this->clearAllReferences();
 
-        return array_keys(get_object_vars($this));
+        $cls = new \ReflectionClass($this);
+        $propertyNames = [];
+        $serializableProperties = array_diff($cls->getProperties(), $cls->getProperties(\ReflectionProperty::IS_STATIC));
+
+        foreach($serializableProperties as $property) {
+            $propertyNames[] = $property->getName();
+        }
+
+        return $propertyNames;
     }
 
     /**
@@ -497,7 +525,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if (!$this->unparsed_unserialized && null !== $this->unparsed) {
             $unparsed_unserialized = substr($this->unparsed, 2, -2);
-            $this->unparsed_unserialized = $unparsed_unserialized ? explode(' | ', $unparsed_unserialized) : array();
+            $this->unparsed_unserialized = '' !== $unparsed_unserialized ? explode(' | ', $unparsed_unserialized) : array();
         }
 
         return $this->unparsed_unserialized;
@@ -585,7 +613,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if (!$this->ep_unserialized && null !== $this->ep) {
             $ep_unserialized = substr($this->ep, 2, -2);
-            $this->ep_unserialized = $ep_unserialized ? explode(' | ', $ep_unserialized) : array();
+            $this->ep_unserialized = '' !== $ep_unserialized ? explode(' | ', $ep_unserialized) : array();
         }
 
         return $this->ep_unserialized;
@@ -633,7 +661,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         }
         if (!$this->collection_unserialized && null !== $this->collection) {
             $collection_unserialized = substr($this->collection, 2, -2);
-            $this->collection_unserialized = $collection_unserialized ? explode(' | ', $collection_unserialized) : array();
+            $this->collection_unserialized = '' !== $collection_unserialized ? explode(' | ', $collection_unserialized) : array();
         }
 
         return $this->collection_unserialized;
@@ -655,7 +683,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         if ($format === null) {
             return $this->date_created;
         } else {
-            return $this->date_created instanceof \DateTime ? $this->date_created->format($format) : null;
+            return $this->date_created instanceof \DateTimeInterface ? $this->date_created->format($format) : null;
         }
     }
 
@@ -675,7 +703,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
         if ($format === null) {
             return $this->last_updated;
         } else {
-            return $this->last_updated instanceof \DateTime ? $this->last_updated->format($format) : null;
+            return $this->last_updated instanceof \DateTimeInterface ? $this->last_updated->format($format) : null;
         }
     }
 
@@ -1037,7 +1065,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     /**
      * Sets the value of [date_created] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTime value.
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
      */
@@ -1045,7 +1073,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->date_created !== null || $dt !== null) {
-            if ($this->date_created === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->date_created->format("Y-m-d H:i:s")) {
+            if ($this->date_created === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->date_created->format("Y-m-d H:i:s.u")) {
                 $this->date_created = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentMetadataTableMap::COL_DATE_CREATED] = true;
             }
@@ -1057,7 +1085,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     /**
      * Sets the value of [last_updated] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTime value.
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
      * @return $this|\Odango\Hebi\Model\TorrentMetadata The current object (for fluent API support)
      */
@@ -1065,7 +1093,7 @@ abstract class TorrentMetadata implements ActiveRecordInterface
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
         if ($this->last_updated !== null || $dt !== null) {
-            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->last_updated->format("Y-m-d H:i:s")) {
+            if ($this->last_updated === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->last_updated->format("Y-m-d H:i:s.u")) {
                 $this->last_updated = $dt === null ? null : clone $dt;
                 $this->modifiedColumns[TorrentMetadataTableMap::COL_LAST_UPDATED] = true;
             }
@@ -1304,28 +1332,32 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
+        if ($this->alreadyInSave) {
+            return 0;
+        }
+
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(TorrentMetadataTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
-            $isInsert = $this->isNew();
             $ret = $this->preSave($con);
+            $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
 
                 if (!$this->isColumnModified(TorrentMetadataTableMap::COL_DATE_CREATED)) {
-                    $this->setDateCreated(time());
+                    $this->setDateCreated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
                 if (!$this->isColumnModified(TorrentMetadataTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(time());
+                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
                 if ($this->isModified() && !$this->isColumnModified(TorrentMetadataTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(time());
+                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
             }
             if ($ret) {
@@ -1533,10 +1565,10 @@ abstract class TorrentMetadata implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->collection, PDO::PARAM_STR);
                         break;
                     case '`date_created`':
-                        $stmt->bindValue($identifier, $this->date_created ? $this->date_created->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->date_created ? $this->date_created->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                     case '`last_updated`':
-                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->last_updated ? $this->last_updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1704,18 +1736,12 @@ abstract class TorrentMetadata implements ActiveRecordInterface
             $keys[18] => $this->getDateCreated(),
             $keys[19] => $this->getLastUpdated(),
         );
-
-        $utc = new \DateTimeZone('utc');
-        if ($result[$keys[18]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[18]];
-            $result[$keys[18]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        if ($result[$keys[18]] instanceof \DateTimeInterface) {
+            $result[$keys[18]] = $result[$keys[18]]->format('c');
         }
 
-        if ($result[$keys[19]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[19]];
-            $result[$keys[19]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        if ($result[$keys[19]] instanceof \DateTimeInterface) {
+            $result[$keys[19]] = $result[$keys[19]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -2304,6 +2330,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function preSave(ConnectionInterface $con = null)
     {
+        if (is_callable('parent::preSave')) {
+            return parent::preSave($con);
+        }
         return true;
     }
 
@@ -2313,7 +2342,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function postSave(ConnectionInterface $con = null)
     {
-
+        if (is_callable('parent::postSave')) {
+            parent::postSave($con);
+        }
     }
 
     /**
@@ -2323,6 +2354,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        if (is_callable('parent::preInsert')) {
+            return parent::preInsert($con);
+        }
         return true;
     }
 
@@ -2332,7 +2366,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-
+        if (is_callable('parent::postInsert')) {
+            parent::postInsert($con);
+        }
     }
 
     /**
@@ -2342,6 +2378,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        if (is_callable('parent::preUpdate')) {
+            return parent::preUpdate($con);
+        }
         return true;
     }
 
@@ -2351,7 +2390,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-
+        if (is_callable('parent::postUpdate')) {
+            parent::postUpdate($con);
+        }
     }
 
     /**
@@ -2361,6 +2402,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        if (is_callable('parent::preDelete')) {
+            return parent::preDelete($con);
+        }
         return true;
     }
 
@@ -2370,7 +2414,9 @@ abstract class TorrentMetadata implements ActiveRecordInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-
+        if (is_callable('parent::postDelete')) {
+            parent::postDelete($con);
+        }
     }
 
 

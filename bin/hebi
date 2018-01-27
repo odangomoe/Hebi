@@ -10,4 +10,4 @@ if (count($argv) < 2) {
     exit(1);
 }
 
-$main->run($argv[1]);
+$main->run($argv[1], array_slice($argv, 2));

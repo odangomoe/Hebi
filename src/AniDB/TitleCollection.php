@@ -34,11 +34,16 @@ class TitleCollection
 
     static public function createFromNode(\DOMNode $node) {
         $col = new static();
+
         /** @var \DOMAttr $animeIdAttr */
         $animeIdAttr = $node->attributes['aid'];
         $col->animeId = $animeIdAttr->value;
 
         foreach ($node->childNodes as $child) {
+            if ($child->nodeName !== 'title') {
+                continue;
+            }
+
             if(AnimeTitle::isAcceptable($child)) {
                 $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId());
             }

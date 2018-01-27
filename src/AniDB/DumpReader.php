@@ -17,22 +17,23 @@ class DumpReader extends Reader
     private $current;
 
     /**
-     * @return \DOMNode
+     * @return TitleCollection[]
      */
-    public function getNextItem() {
-        if ($this->current == null) {
-            $this->current = $this->getDocument()->find('animetitles')[0]->childNodes[0];
-        } else {
-            $this->current = $this->current->nextSibling;
+    public function getAllTitleCollections(): array
+    {
+        $items = [];
+        while (($item = $this->getNextTitleCollection()) !== null) {
+            $items[] = $item;
         }
 
-        return $this->current;
+        return $items;
     }
 
     /**
      * @return TitleCollection
      */
-    public function getNextTitleCollection() {
+    public function getNextTitleCollection()
+    {
         $item = $this->getNextItem();
         if ($item === null) {
             return null;
@@ -42,14 +43,20 @@ class DumpReader extends Reader
     }
 
     /**
-     * @return TitleCollection[]
+     * @return \DOMNode
      */
-    public function getAllTitleCollections(): array {
-        $items = [];
-        while (($item = $this->getNextTitleCollection()) !== null) {
-            $items[] = $item;
+    public function getNextItem()
+    {
+        if ($this->current == null) {
+            $this->current = $this->getDocument()->find('animetitles')[0]->childNodes[0];
+        } else {
+            $this->current = $this->current->nextSibling;
         }
 
-        return $items;
+        while ($this->current !== null && $this->current->nodeName !== 'anime') {
+            $this->current = $this->current->nextSibling;
+        }
+
+        return $this->current;
     }
 }

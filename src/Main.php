@@ -23,7 +23,7 @@ class Main
 
     public function init($connection = null) {
         $this->initContainer();
-        $this->container['main'] = $this;
+        $this->container['run'] = $this;
         $this->initConfig();
         $this->initLogger();
         $this->initPropel($connection);
@@ -77,7 +77,7 @@ class Main
      * @codeCoverageIgnore
      * @param $action string
      */
-    public function run($action) {
+    public function run($action, $args) {
         $this->init();
 
         switch ($action) {
@@ -87,11 +87,14 @@ class Main
                 break;
             case 'anidb':
                 $importer = new Importer($this->container);
-                $importer->run();
+                $importer->run($args[0]??null);
                 break;
             case 'atama':
                 $updater = new Updater($this->container);
                 $updater->run();
+            case 'nyaa-backup':
+                $importer = new \Odango\Hebi\NyaaBackup\Importer($this->container);
+                $importer->run();
             default:
                 echo "Action '{$action}' doesn't exist\n";
                 exit(1);
