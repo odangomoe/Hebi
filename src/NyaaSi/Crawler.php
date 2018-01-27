@@ -67,7 +67,7 @@ class Crawler
         $torrent->setDateCrawled(new \DateTime());
         # nyaa.si hides the submitter_id and only shows
         # names
-        # $torrent->setSubmitterId($info['uploader_id']);
+        $torrent->setSubmitterId(0);
         $query = parse_query(substr($info['magnet'], 8));
         $torrent->setTrackers((array)($query['tr'] ?? []));
 
