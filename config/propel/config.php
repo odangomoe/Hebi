@@ -15,6 +15,11 @@ $manager->setConfiguration(array (
     ),
   ),
   'classname' => '\\Propel\\Runtime\\Connection\\ConnectionWrapper',
+  'model_paths' =>
+  array (
+    0 => 'src',
+    1 => 'vendor',
+  ),
 ));
 $manager->setName('default');
 $serviceContainer->setConnectionManager('default', $manager);
