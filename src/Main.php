@@ -40,9 +40,6 @@ class Main
     public function initGuzzle($options) {
 
         $cookieFile  =__DIR__ . '/../storage/cookie-jar';
-
-        touch($cookieFile);
-
         $cookieJar = new FileCookieJar($cookieFile, true);
 
         $this->container['guzzle'] = new Client(
