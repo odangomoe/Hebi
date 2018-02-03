@@ -26,9 +26,13 @@ class Crawler
         echo 'Latest id: ' . $latestId . "\n";
 
         $latestKnown = TorrentQuery::create()->orderById(Criteria::DESC)->findOne();
-        $latestKnownId = $latestKnown->getId();
+        $latestKnownId = 0;
 
-        echo 'Latest known id: ' . $latestKnown->getId() . "\n";
+        if ($latestKnown !== null) {
+            $latestKnownId = $latestKnown->getId();
+        }
+
+        echo 'Latest known id: ' . $latestKnownId . "\n";
         echo 'Amount of links to crawl: ' . ($latestId - $latestKnownId) . "\n";
 
         $this->crawl($latestKnownId, $latestId);
