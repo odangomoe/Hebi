@@ -4,6 +4,7 @@
 namespace Odango\Hebi;
 
 
+use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Client;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -37,7 +38,18 @@ class Main
     }
 
     public function initGuzzle($options) {
-        $this->container['guzzle'] = new Client($options);
+
+        $cookieFile  =__DIR__ . '/../storage/cookie-jar';
+
+        touch($cookieFile);
+
+        $cookieJar = new FileCookieJar($cookieFile, true);
+
+        $this->container['guzzle'] = new Client(
+            array_merge($options, [
+                'cookies' => $cookieJar
+            ])
+        );
     }
 
     public function initPropel($config = null) {
