@@ -44,6 +44,12 @@ class Main
 
         $this->container['guzzle'] = new Client(
             array_merge($options, [
+                'headers' => [
+                    "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/50.0.2661.102 Chrome/50.0.2661.102 Safari/537.36",
+                    "Accept" => "*/*",
+                    "Accept-Encoding" => "gzip, deflate, sdch",
+                    "Accept-Language" => "en-GB,en-US;q=0.8,en;q=0.6"
+                ],
                 'cookies' => $cookieJar
             ])
         );
