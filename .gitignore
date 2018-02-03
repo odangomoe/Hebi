@@ -3,6 +3,7 @@ vendor
 .idea
 test/data/sql
 build
+!storage/.dir
 storage/
 composer.lock
 config/hebi.yml
