@@ -35,6 +35,19 @@ class DumpReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(4, $firstItems);
 
         $mainJojo = $titleCollections[3];
-        $this->assertEquals("JoJo's Bizarre Adventure: Golden Wind", $mainJojo->getMainTitleName());
+        $this->assertCount(4, $mainJojo->getTitles());
+        $this->assertEquals("JoJo`s Bizarre Adventure: Golden Wind", $mainJojo->getMainTitleName());
+
+        $fixedJojo = 'JoJo\'s Bizarre Adventure - Golden Wind';
+        $foundFixed = false;
+
+
+        foreach ($titleCollections[3]->getTitles() as $title) {
+            if ($title->getName() === $fixedJojo) {
+                $foundFixed = true;
+            }
+        }
+
+        $this->assertTrue($foundFixed, "Couldn't find fixed title for JoJo");
     }
 }

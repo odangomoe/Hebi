@@ -22,7 +22,7 @@ class TitleCollection
     /**
      * @var AnimeTitle[]
      */
-    private $titles= [];
+    private $titles = [];
 
     /**
      * @return AnimeTitle[]
@@ -32,7 +32,8 @@ class TitleCollection
         return $this->titles;
     }
 
-    static public function createFromNode(\DOMNode $node, $replace = []) {
+    static public function createFromNode(\DOMNode $node, $replace = [])
+    {
         $col = new static();
 
         /** @var \DOMAttr $animeIdAttr */
@@ -44,9 +45,11 @@ class TitleCollection
                 continue;
             }
 
-            if(AnimeTitle::isAcceptable($child)) {
+            if (AnimeTitle::isAcceptable($child)) {
                 $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId(), $replace);
             }
+
+            $col->titles = array_merge($col->titles, AnimeTitle::createVariationsFromNode($child, $col->getAnimeId(), $replace));
         }
 
         $col->cleanTitles();
@@ -54,7 +57,8 @@ class TitleCollection
         return $col;
     }
 
-    private function cleanTitles() {
+    private function cleanTitles()
+    {
         $saved = [];
         $titles = [];
         $mainTitle = $this->getMainTitle();
@@ -77,7 +81,8 @@ class TitleCollection
     /** @var AnimeTitle */
     private $mainTitle;
 
-    public function getMainTitle() {
+    public function getMainTitle()
+    {
         if ($this->mainTitle !== null) {
             return $this->mainTitle;
         }
@@ -92,7 +97,8 @@ class TitleCollection
         return $this->titles[0] ?? null;
     }
 
-    public function getMainTitleName() {
+    public function getMainTitleName()
+    {
         $title = $this->getMainTitle();
 
         if ($title === null) {
@@ -102,7 +108,8 @@ class TitleCollection
         return $title->getName();
     }
 
-    public function save($conn = null) {
+    public function save($conn = null)
+    {
         foreach ($this->getTitles() as $title) {
             $title->save($conn);
         }

@@ -23,7 +23,7 @@ class AnimeTitle extends BaseAnimeTitle
         return in_array($langValue, ["en", "x-jat"]);
     }
 
-    static public function createFromNode(\DOMNode $node, $animeId, $replace = []): AnimeTitle
+    static public function createFromNode(\DOMNode $node, $animeId): AnimeTitle
     {
         $title = new AnimeTitle();
         $title->setAnimeId($animeId);
@@ -36,13 +36,54 @@ class AnimeTitle extends BaseAnimeTitle
         }
 
         $title->setName(
-            str_replace(
-                array_keys($replace),
-                array_values($replace),
-                trim($node->textContent)
-            )
+            trim($node->textContent)
         );
 
         return $title;
     }
+
+    public static function createVariation($name, $animeId)
+    {
+        $title = new AnimeTitle();
+        $title->setAnimeId($animeId);
+        $title->setMain(false);
+        $title->setName(trim($name));
+
+        return $title;
+    }
+
+    public static function createVariationsFromName($name, $animeId)
+    {
+        $titles = [];
+        if (preg_match('~\w:\s~', $name)) {
+            $titles[] = static::createVariation(preg_replace('~(\w):\s~', '$1 - ', $name), $animeId);
+        }
+
+        return $titles;
+    }
+
+    public static function createVariationsFromNode($node, $animeId, array $replace)
+    {
+        $normal = static::createFromNode($node, $animeId);
+
+        $replaced = str_replace(
+            array_keys($replace),
+            array_values($replace),
+            $normal->getName()
+        );
+
+        $titles = [];
+
+        if ($replaced !== $normal->getName()) {
+            $titles[] = static::createVariation($replaced, $animeId);
+            $titles = array_merge($titles, static::createVariationsFromName($replaced, $animeId));
+        }
+
+        $titles = array_merge($titles, static::createVariationsFromName($normal->getName(), $animeId));
+
+
+        return $titles;
+    }
+
+
 }
