@@ -60,6 +60,7 @@ class Importer
     public function import($xml)
     {
         $source = file_get_contents($xml);
+        $source = gzdecode($source);
         $collections = DumpReader::createFromSourceWithReplace($source, $this->config['replace'] ?? [])->getAllTitleCollections();
 
         foreach ($collections as $collection) {
