@@ -17,6 +17,19 @@ class DumpReader extends Reader
     private $current;
 
     /**
+     * @var array
+     */
+    private $replace = [];
+
+    /**
+     * @param array $replace
+     */
+    public function setReplace(array $replace): void
+    {
+        $this->replace = $replace;
+    }
+
+    /**
      * @return TitleCollection[]
      */
     public function getAllTitleCollections(): array
@@ -39,7 +52,7 @@ class DumpReader extends Reader
             return null;
         }
 
-        return TitleCollection::createFromNode($item);
+        return TitleCollection::createFromNode($item, $this->replace);
     }
 
     /**
@@ -58,5 +71,12 @@ class DumpReader extends Reader
         }
 
         return $this->current;
+    }
+
+    static public function createFromSourceWithReplace($source, $replace = [])
+    {
+        $reader = static::createFromSource($source);
+        $reader->setReplace($replace);
+        return $reader;
     }
 }

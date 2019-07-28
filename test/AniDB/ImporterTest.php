@@ -45,7 +45,7 @@ class ImporterTest extends \PHPUnit_Framework_TestCase
         $importer = new Importer($this->container);
         $importer->run();
         $titles = AnimeTitleQuery::create()->filterByMain(true)->groupByAnimeId()->find();
-        $this->assertCount(3, $titles);
+        $this->assertCount(4, $titles);
         AnimeTitleQuery::create()->deleteAll();
     }
 
@@ -54,13 +54,13 @@ class ImporterTest extends \PHPUnit_Framework_TestCase
 
         $title = new AnimeTitle();
         $title->setName("Test");
-        $title->setAnimeId(4);
+        $title->setAnimeId(5);
         $title->save();
 
         $importer->boot();
         $importer->clear();
         Propel::getWriteConnection('default')->rollBack();
-        $title = AnimeTitleQuery::create()->findOneByAnimeId(4);
+        $title = AnimeTitleQuery::create()->findOneByAnimeId(5);
         $this->assertEquals("Test", $title->getName());
     }
 }

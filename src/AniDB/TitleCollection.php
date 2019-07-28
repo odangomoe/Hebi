@@ -32,7 +32,7 @@ class TitleCollection
         return $this->titles;
     }
 
-    static public function createFromNode(\DOMNode $node) {
+    static public function createFromNode(\DOMNode $node, $replace = []) {
         $col = new static();
 
         /** @var \DOMAttr $animeIdAttr */
@@ -45,7 +45,7 @@ class TitleCollection
             }
 
             if(AnimeTitle::isAcceptable($child)) {
-                $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId());
+                $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId(), $replace);
             }
         }
 

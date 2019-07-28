@@ -4,10 +4,7 @@
 namespace Odango\Hebi\AniDB;
 
 
-use GuzzleHttp\Client;
-use Odango\Hebi\Model\AnimeTitle;
 use Odango\Hebi\Model\Base\AnimeTitleQuery;
-use Odango\Hebi\Model\Map\AnimeTitleTableMap;
 use Propel\Runtime\Propel;
 
 class Importer
@@ -21,7 +18,8 @@ class Importer
         $this->config = $container['config']['anidb'] ?? [];
     }
 
-    public function run($path = null) {
+    public function run($path = null)
+    {
         $this->boot();
         if ($path === null) {
             $path = $this->download();
@@ -31,18 +29,21 @@ class Importer
         $this->finish();
     }
 
-    public function finish() {
+    public function finish()
+    {
         $this->connection->commit();
     }
 
-    public function boot() {
+    public function boot()
+    {
         $conn = Propel::getWriteConnection('default');
         $conn->beginTransaction();
         $this->connection = $conn;
     }
 
-    public function download(): string {
-        $path = tempnam(sys_get_temp_dir(), 'hebi-ani').'.xml';
+    public function download(): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'hebi-ani') . '.xml';
 
         $client = $this->container['guzzle'];
         $client->request(
@@ -56,9 +57,10 @@ class Importer
         return $path;
     }
 
-    public function import($xml) {
+    public function import($xml)
+    {
         $source = file_get_contents($xml);
-        $collections = DumpReader::createFromSource($source)->getAllTitleCollections();
+        $collections = DumpReader::createFromSourceWithReplace($source, $this->config['replace'] ?? [])->getAllTitleCollections();
 
         foreach ($collections as $collection) {
             if (count($collection->getTitles()) > 0) {
@@ -67,7 +69,8 @@ class Importer
         }
     }
 
-    public function clear() {
+    public function clear()
+    {
         AnimeTitleQuery::create()->deleteAll($this->connection);
     }
 }

@@ -446,7 +446,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [last_updated] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw DateTime object will be returned.
      *
      * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
@@ -466,7 +466,7 @@ abstract class TorrentStatus implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw DateTime object will be returned.
      *
      * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
@@ -863,12 +863,13 @@ abstract class TorrentStatus implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-
+                $time = time();
+                $highPrecision = \Propel\Runtime\Util\PropelDateTime::createHighPrecision();
                 if (!$this->isColumnModified(TorrentStatusTableMap::COL_CREATED_AT)) {
-                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setCreatedAt($highPrecision);
                 }
                 if (!$this->isColumnModified(TorrentStatusTableMap::COL_LAST_UPDATED)) {
-                    $this->setLastUpdated(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                    $this->setLastUpdated($highPrecision);
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);

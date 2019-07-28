@@ -4,8 +4,8 @@
 namespace Odango\Hebi;
 
 
-use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\FileCookieJar;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Odango\Hebi\AniDB\Importer;
@@ -23,7 +23,8 @@ class Main
      */
     private $container;
 
-    public function init($connection = null) {
+    public function init($connection = null)
+    {
         $this->initContainer();
         $this->container['run'] = $this;
         $this->initConfig();
@@ -33,13 +34,15 @@ class Main
         ini_set('memory_limit', -1);
     }
 
-    public function getContainer(): Container {
+    public function getContainer(): Container
+    {
         return $this->container;
     }
 
-    public function initGuzzle($options) {
+    public function initGuzzle($options)
+    {
 
-        $cookieFile  =__DIR__ . '/../storage/cookie-jar';
+        $cookieFile = __DIR__ . '/../storage/cookie-jar';
         $cookieJar = new FileCookieJar($cookieFile, true);
 
         $this->container['guzzle'] = new Client(
@@ -55,7 +58,8 @@ class Main
         );
     }
 
-    public function initPropel($config = null) {
+    public function initPropel($config = null)
+    {
         $prefix = "";
         if ($config !== null) {
             $prefix = $config . '-';
@@ -65,19 +69,24 @@ class Main
         Propel::getServiceContainer()->setLogger('defaultLogger', $this->container['logger']);
     }
 
-    public function initContainer() {
+    public function initContainer()
+    {
         $this->container = new Container();
     }
 
-    public function initLogger() {
+    public function initLogger()
+    {
         $logger = new Logger("Hebi");
-        $filename = $this->container['config']['log'];
-        if ($filename[0] !== '/') {
-            $filename = __DIR__ . '/../' . $filename;
-        }
+        $filename = $this->container['config']['log'] ?? false;
 
-        $handler = new StreamHandler($filename);
-        $logger->pushHandler($handler);
+        if ($filename !== false) {
+            if ($filename[0] !== '/') {
+                $filename = __DIR__ . '/../' . $filename;
+            }
+
+            $handler = new StreamHandler($filename);
+            $logger->pushHandler($handler);
+        }
 
         $handler = new StreamHandler('php://stdout');
         $logger->pushHandler($handler);
@@ -85,15 +94,23 @@ class Main
         $this->container['logger'] = $logger;
     }
 
-    public function initConfig() {
-        $this->container['config'] = Yaml::parse(file_get_contents(__DIR__ . '/../config/hebi.yml'))['hebi'] ?? [];
+    public function initConfig()
+    {
+        $configPath = __DIR__ . '/../config/hebi.yml';
+        $config = [];
+        if (file_exists($configPath)) {
+            $config = Yaml::parse(file_get_contents($configPath))['hebi'] ?? [];
+        }
+
+        $this->container['config'] = $config;
     }
 
     /**
      * @codeCoverageIgnore
      * @param $action string
      */
-    public function run($action, $args) {
+    public function run($action, $args)
+    {
         $this->init();
 
         switch ($action) {
@@ -103,14 +120,14 @@ class Main
                 break;
             case 'anidb':
                 $importer = new Importer($this->container);
-                $importer->run($args[0]??null);
+                $importer->run($args[0] ?? null);
                 break;
             case 'atama':
                 $updater = new Updater($this->container);
                 $updater->run();
                 break;
             case 'nyaa-backup':
-                $importer = new \Odango\Hebi\NyaaBackup\Importer($this->container);
+                $importer = new NyaaBackup\Importer($this->container);
                 $importer->run();
                 break;
             case 'nyaasi':

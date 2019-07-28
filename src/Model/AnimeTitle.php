@@ -16,13 +16,15 @@ use Odango\Hebi\Model\Base\AnimeTitle as BaseAnimeTitle;
  */
 class AnimeTitle extends BaseAnimeTitle
 {
-    static public function isAcceptable(\DOMNode $node) {
+    static public function isAcceptable(\DOMNode $node)
+    {
         $lang = $node->attributes->getNamedItem('xml:lang');
         $langValue = $lang === null ? "" : $lang->textContent;
         return in_array($langValue, ["en", "x-jat"]);
     }
 
-    static public function createFromNode(\DOMNode $node, $animeId): AnimeTitle {
+    static public function createFromNode(\DOMNode $node, $animeId, $replace = []): AnimeTitle
+    {
         $title = new AnimeTitle();
         $title->setAnimeId($animeId);
         /** @var \DOMNode|null $type */
@@ -32,7 +34,14 @@ class AnimeTitle extends BaseAnimeTitle
         } else {
             $title->setMain($type->nodeValue === 'main');
         }
-        $title->setName(trim($node->textContent));
+
+        $title->setName(
+            str_replace(
+                array_keys($replace),
+                array_values($replace),
+                trim($node->textContent)
+            )
+        );
 
         return $title;
     }

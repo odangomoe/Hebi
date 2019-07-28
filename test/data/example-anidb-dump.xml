@@ -42,4 +42,7 @@
         <title xml:lang="ru" type="syn">3х3 глаза: Сказание Сэймы</title>
         <title xml:lang="x-jat" type="syn">Shin 3x3 Eyes</title>
     </anime>
+    <anime aid="4">
+        <title xml:lang="x-jat" type="main">JoJo`s Bizarre Adventure: Golden Wind</title>
+    </anime>
 </animetitles>
