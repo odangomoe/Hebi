@@ -18,25 +18,41 @@ use Odango\Hebi\Model\Map\TorrentMetadataTableMap;
  */
 class TorrentMetadata extends BaseTorrentMetadata
 {
-    public function applyTitle($title) {
+    public function applyTitle($title)
+    {
         $metadata = Metadata::createFromTitle($title);
 
         foreach ($metadata as $key => $value) {
             $colName = str_replace('-', '_', $key);
             try {
-                $phpName = TorrentMetadataTableMap::translateFieldName($colName, TorrentMetadataTableMap::TYPE_FIELDNAME, TorrentMetadataTableMap::TYPE_PHPNAME);
+                $phpName = TorrentMetadataTableMap::translateFieldName(
+                    $colName,
+                    TorrentMetadataTableMap::TYPE_FIELDNAME,
+                    TorrentMetadataTableMap::TYPE_PHPNAME
+                );
             } catch (\Exception $e) {
-                $this->log('No column for metadata key "' . $key . '"');
+                $this->log('No column for metadata key "'.$key.'"');
                 continue;
             }
 
-            $func = 'set' . $phpName;
+            // Make sure collection is a -flat- array
+            if ($key === 'collection') {
+                $value = array_map(
+                    function ($item) {
+                        return implode(',', $item);
+                    },
+                    $value
+                );
+            }
+
+            $func = 'set'.$phpName;
             // DIRTY HACKS
             $this->{$func}($value);
         }
     }
 
-    private function normalizeArray($arr) {
+    private function normalizeArray($arr)
+    {
         foreach ($arr as $key => $item) {
             if (is_array($item)) {
                 $arr[$key] = $this->normalizeArray($item);
@@ -48,7 +64,8 @@ class TorrentMetadata extends BaseTorrentMetadata
         return $arr;
     }
 
-    public function hasChanged(TorrentMetadata $metadata) {
+    public function hasChanged(TorrentMetadata $metadata)
+    {
         $a = $this->toArray();
         $b = $metadata->toArray();
         $toUnset = ["DateCreated", "LastUpdated"];
