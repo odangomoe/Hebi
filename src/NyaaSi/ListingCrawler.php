@@ -8,6 +8,7 @@ use DOMWrap\Document;
 use DOMWrap\Element;
 use Odango\Hebi\Model\Torrent;
 use Odango\Hebi\Model\TorrentQuery;
+use Propel\Runtime\Propel;
 
 use function GuzzleHttp\Psr7\parse_query;
 
@@ -66,10 +67,13 @@ class ListingCrawler
 
         $items = TorrentQuery::create()->findById($foundTorrentIds);
         foreach ($items as $item) {
-            echo "Skipping Torrent#" . $item->getId() . " already known\n";
+            echo "Skipping Torrent#".$item->getId()." already known\n";
             unset($foundTorrents[$item->getId()]);
         }
 
+        $conn = Propel::getWriteConnection('default');
+
+        $conn->beginTransaction();
         foreach ($foundTorrents as $foundTorrent) {
             $torrent = new Torrent();
             $torrent->setId($foundTorrent[0]);
@@ -79,10 +83,11 @@ class ListingCrawler
             $torrent->setDateCrawled(new \DateTime());
             $torrent->setSubmitterId(0);
 
-            $torrent->save();
-            $torrent->createMetadata();
+            $torrent->save($conn);
+            $torrent->createMetadata($conn);
 
-            echo "Added Torrent#" . $torrent->getId() . "\n";
+            echo "Added Torrent#".$torrent->getId()."\n";
         }
+        $conn->commit();
     }
 }
