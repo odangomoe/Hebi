@@ -12,6 +12,8 @@ use Odango\Hebi\AniDB\Importer;
 use Odango\Hebi\Atama\Updater;
 use Odango\Hebi\Nyaa\Iterator;
 use Odango\Hebi\NyaaSi\Crawler;
+use Odango\Hebi\NyaaSi\ListingCrawler;
+use Odango\Hebi\NyaaSi\RSSCrawler;
 use Pimple\Container;
 use Propel\Runtime\Propel;
 use Symfony\Component\Yaml\Yaml;
@@ -41,20 +43,22 @@ class Main
 
     public function initGuzzle($options)
     {
-
-        $cookieFile = __DIR__ . '/../storage/cookie-jar';
-        $cookieJar = new FileCookieJar($cookieFile, true);
+        $cookieFile = __DIR__.'/../storage/cookie-jar';
+        $cookieJar  = new FileCookieJar($cookieFile, true);
 
         $this->container['guzzle'] = new Client(
-            array_merge($options, [
-                'headers' => [
-                    "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/50.0.2661.102 Chrome/50.0.2661.102 Safari/537.36",
-                    "Accept" => "*/*",
-                    "Accept-Encoding" => "gzip, deflate, sdch",
-                    "Accept-Language" => "en-GB,en-US;q=0.8,en;q=0.6"
-                ],
-                'cookies' => $cookieJar
-            ])
+            array_merge(
+                $options,
+                [
+                    'headers' => [
+                        "User-Agent"      => "Mozilla/5.0 (X11; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0",
+                        "Accept"          => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                        "Accept-Encoding" => "gzip, deflate",
+                        "Accept-Language" => "en-US,en;q=0.5",
+                    ],
+                    'cookies' => $cookieJar,
+                ]
+            )
         );
     }
 
@@ -62,10 +66,10 @@ class Main
     {
         $prefix = "";
         if ($config !== null) {
-            $prefix = $config . '-';
+            $prefix = $config.'-';
         }
 
-        include __DIR__ . '/../config/propel/' . $prefix . 'config.php';
+        include __DIR__.'/../config/propel/'.$prefix.'config.php';
         Propel::getServiceContainer()->setLogger('defaultLogger', $this->container['logger']);
     }
 
@@ -76,12 +80,12 @@ class Main
 
     public function initLogger()
     {
-        $logger = new Logger("Hebi");
+        $logger   = new Logger("Hebi");
         $filename = $this->container['config']['log'] ?? false;
 
         if ($filename !== false) {
             if ($filename[0] !== '/') {
-                $filename = __DIR__ . '/../' . $filename;
+                $filename = __DIR__.'/../'.$filename;
             }
 
             $handler = new StreamHandler($filename);
@@ -96,8 +100,8 @@ class Main
 
     public function initConfig()
     {
-        $configPath = __DIR__ . '/../config/hebi.yml';
-        $config = [];
+        $configPath = __DIR__.'/../config/hebi.yml';
+        $config     = [];
         if (file_exists($configPath)) {
             $config = Yaml::parse(file_get_contents($configPath))['hebi'] ?? [];
         }
@@ -107,6 +111,7 @@ class Main
 
     /**
      * @codeCoverageIgnore
+     *
      * @param $action string
      */
     public function run($action, $args)
@@ -133,6 +138,19 @@ class Main
             case 'nyaasi':
                 $crawler = new Crawler($this->container);
                 $crawler->run();
+                break;
+            case 'nyaasi-rss':
+                $rssCrawler = new RSSCrawler($this->container);
+                $rssCrawler->run();
+                break;
+            case 'nyaasi-listing':
+                $listingCrawler = new ListingCrawler($this->container);
+                if (count($args) < 1) {
+                    error_log("Need path with listing files for action nyaasi-listing");
+                    exit(1);
+                }
+
+                $listingCrawler->run($args[0]);
                 break;
             default:
                 echo "Action '{$action}' doesn't exist\n";

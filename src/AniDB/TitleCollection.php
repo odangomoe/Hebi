@@ -46,7 +46,7 @@ class TitleCollection
             }
 
             if (AnimeTitle::isAcceptable($child)) {
-                $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId(), $replace);
+                $col->titles[] = AnimeTitle::createFromNode($child, $col->getAnimeId());
             }
 
             $col->titles = array_merge($col->titles, AnimeTitle::createVariationsFromNode($child, $col->getAnimeId(), $replace));

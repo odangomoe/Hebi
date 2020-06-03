@@ -4,6 +4,9 @@ hebi:
     dump-url: 'http://anidb.net/api/anime-titles.xml.gz'
     replace:
       '`': "'"
+      'Season 2': 'S2'
+      'Season 3': 'S3'
+      'Season 4': 'S4'
   nyaa:
     category:
       - '1_37'
@@ -12,3 +15,7 @@ hebi:
     status-file: '/remote/nyaa-mirror/status.json'
   nyaa-backup:
     dsn: 'pgsql:dbname=nyaa;user=nyaa'
+  nyaa.si:
+    auth:
+      - username
+      - password

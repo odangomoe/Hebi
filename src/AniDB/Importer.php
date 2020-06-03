@@ -44,6 +44,9 @@ class Importer
     public function download(): string
     {
         $path = tempnam(sys_get_temp_dir(), 'hebi-ani') . '.xml';
+        if (substr($this->config['dump-url'], -3) === '.gz') {
+            $path .= '.gz';
+        }
 
         $client = $this->container['guzzle'];
         $client->request(
