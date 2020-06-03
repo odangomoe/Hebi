@@ -50,7 +50,7 @@ class ListingCrawler
             }
 
             /** @var Element $link */
-            $link            = $columns[1]->find('a')->first();
+            $link            = $columns[1]->find('a')->last();
             $parts           = explode('/', $link->getAttribute('href'));
             $torrentId       = intval(array_pop($parts));
             $torrentTitle    = $link->getAttribute('title');
@@ -65,15 +65,27 @@ class ListingCrawler
             $foundTorrentIds[]         = $torrentId;
         }
 
-        $items = TorrentQuery::create()->findById($foundTorrentIds);
-        foreach ($items as $item) {
-            echo "Skipping Torrent#".$item->getId()." already known\n";
-            unset($foundTorrents[$item->getId()]);
-        }
-
         $conn = Propel::getWriteConnection('default');
 
         $conn->beginTransaction();
+
+        $items = TorrentQuery::create()->findById($foundTorrentIds);
+        foreach ($items as $item) {
+            list($id, $title) = $foundTorrents[$item->getId()];
+            if ($item->getTorrentTitle() !== $title) {
+                $item->setTorrentTitle($title);
+
+                $item->save($conn);
+                $item->createMetadata($conn);
+
+                echo "Updated Torrent#" . $item->getId() . "\n";
+            } else {
+                echo "Skipped Torrent#" . $item->getId() . "\n";
+            }
+
+            unset($foundTorrents[$item->getId()]);
+        }
+
         foreach ($foundTorrents as $foundTorrent) {
             $torrent = new Torrent();
             $torrent->setId($foundTorrent[0]);
