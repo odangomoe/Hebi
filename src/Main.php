@@ -141,7 +141,7 @@ class Main
                 break;
             case 'nyaasi-rss':
                 $rssCrawler = new RSSCrawler($this->container);
-                $rssCrawler->run();
+                $rssCrawler->run($args[0] ?? "");
                 break;
             case 'nyaasi-listing':
                 $listingCrawler = new ListingCrawler($this->container);

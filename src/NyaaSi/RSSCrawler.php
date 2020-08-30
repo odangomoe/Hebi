@@ -24,19 +24,31 @@ class RSSCrawler
         $this->container = $container;
     }
 
-    public function run()
+    public function run($version = "")
     {
-        $latestKnown = TorrentQuery::create()->orderById(Criteria::DESC)->findOne();
+
+        /** @var Client $client */
+        $client = $this->container['guzzle'];
+
+        if ($version === "") {
+            $data = $client->get('https://nyaa.si/?page=rss&c=1_2&m');
+            $latestKnown = TorrentQuery::create()->orderById(Criteria::DESC)->findOne();
+        }
+        if ($version === "sukebei") {
+            $data = $client->get('https://sukebei.nyaa.si/?page=rss&c=1_1&m');
+            $latestKnown = TorrentQuery::create()->orderById(Criteria::ASC)->findOne();
+        }
+
         $latestKnownId = 0;
+
+        if (!isset($data) || !$data) {
+            throw new \Exception("Failed to fetch data");
+        }
 
         if ($latestKnown !== null) {
             $latestKnownId = intval($latestKnown->getId());
         }
 
-        /** @var Client $client */
-        $client = $this->container['guzzle'];
-
-        $data = $client->get('https://nyaa.si/?page=rss&c=1_2&m');
         $doc = new SimpleXMLElement($data->getBody()->getContents());
         $foundLatest = false;
 
@@ -47,7 +59,6 @@ class RSSCrawler
             $currentId = intval($link[count($link) - 1]);
 
             $currentTitle = $item->title->__toString();
-
             $magnetUri = trim($item->link->__toString());
             $query = parse_query(substr($magnetUri, 8));
             $currentTrackers = (array)($query['tr'] ?? []);
@@ -57,7 +68,11 @@ class RSSCrawler
                 continue;
             }
 
-            if ($latestKnownId > $currentId) {
+            if ($version === "sukebei") {
+                $currentId = -$currentId;
+            }
+
+            if (($version === "" && $latestKnownId > $currentId) || ($version === "sukebei" && $latestKnownId < $currentId )) {
                 continue;
             }
 
