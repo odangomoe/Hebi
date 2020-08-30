@@ -35,6 +35,8 @@ class ListingCrawler
         $doc  = new Document();
         $doc->setHtml($data);
 
+        $brand = $doc->find('.navbar-brand')->text();
+
         $torrentItems    = $doc->find('.torrent-list > tbody > tr');
         $foundTorrents   = [];
         $foundTorrentIds = [];
@@ -43,9 +45,11 @@ class ListingCrawler
         foreach ($torrentItems as $torrentItem) {
             /** @var Element[] $columns */
             $columns  = $torrentItem->children();
-            $category = substr($columns[0]->find('a')->first()->getAttribute('href'), 4);
+            $query = parse_url($columns[0]->find('a')->first()->getAttribute('href'), PHP_URL_QUERY);
+            $query = parse_query($query);
+            $category = $query['c'];
 
-            if ($category !== '1_2') {
+            if (($brand !== "Sukebei" && $category !== '1_2') || ($brand === "Sukebei" && $category !== "1_1")) {
                 continue;
             }
 
@@ -60,6 +64,10 @@ class ListingCrawler
             $torrentTrackers = (array)($query['tr'] ?? []);
             $xtParts         = explode(":", $query['xt']);
             $torrentInfoHash = array_pop($xtParts);
+
+            if ($brand === "Sukebei") {
+                $torrentId = -$torrentId;
+            }
 
             $foundTorrents[$torrentId] = [$torrentId, $torrentTitle, $torrentInfoHash, $torrentTrackers];
             $foundTorrentIds[]         = $torrentId;

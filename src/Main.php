@@ -13,6 +13,7 @@ use Odango\Hebi\Atama\Updater;
 use Odango\Hebi\Nyaa\Iterator;
 use Odango\Hebi\NyaaSi\Crawler;
 use Odango\Hebi\NyaaSi\ListingCrawler;
+use Odango\Hebi\NyaaSi\PageCrawler;
 use Odango\Hebi\NyaaSi\RSSCrawler;
 use Pimple\Container;
 use Propel\Runtime\Propel;
@@ -151,6 +152,15 @@ class Main
                 }
 
                 $listingCrawler->run($args[0]);
+                break;
+            case 'nyaasi-page':
+                $pageCrawler = new PageCrawler($this->container);
+                if (count($args) < 1) {
+                    error_log("Need path with listing files for action nyaasi-page");
+                    exit(1);
+                }
+
+                $pageCrawler->run($args[0]);
                 break;
             default:
                 echo "Action '{$action}' doesn't exist\n";
