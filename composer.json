@@ -11,7 +11,7 @@
     "pimple/pimple": "^3.0",
     "symfony/yaml": "^3.1",
     "league/flysystem": "^1.0",
-    "odango/atama": "^2.0.0",
+    "odango/atama": "^2.1.0",
     "bcncommerce/json-stream": "^0.3.0",
     "php-coveralls/php-coveralls": "^2.0",
     "ext-dom": "*",

@@ -22,7 +22,11 @@ class TorrentMetadata extends BaseTorrentMetadata
     {
         $metadata = Metadata::createFromTitle($title);
 
-        foreach ($metadata as $key => $value) {
+	foreach ($metadata as $key => $value) {
+	    if ($key === "alternative-names") {
+                continue;
+	    }
+
             $colName = str_replace('-', '_', $key);
             try {
                 $phpName = TorrentMetadataTableMap::translateFieldName(
